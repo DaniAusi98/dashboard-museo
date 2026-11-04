@@ -1,19 +1,21 @@
-import { useCallback, useRef, useState } from "react";
-import esLocale from "@fullcalendar/core/locales/es";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import { useCallback, useRef, useState } from 'react';
+import Box from '@mui/material/Box';
 
-import CalendarToolbar from "./CalendarToolbar";
-import { getCalendarEvents } from "./calendarServiceMock";
-import ActivityPopover from "./ActivityPopover";
-import ActivityTodayGrid from "./ActivityTodayGrid";
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import esLocale from '@fullcalendar/core/locales/es';
+
+import CalendarToolbar from './CalendarToolbar';
+import { getCalendarEvents } from './calendarService';
+import ActivityPopover from './ActivityPopover';
+import ActivityTodayGrid from './ActivityTodayGrid';
 
 export default function MainCalendar() {
   const calendarRef = useRef(null);
-  const [view, setView] = useState("dayGridMonth");
-  const [title, setTitle] = useState("");
+  const [view, setView] = useState('dayGridMonth');
+  const [title, setTitle] = useState('');
 
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -28,13 +30,13 @@ export default function MainCalendar() {
     try {
       const data = await getCalendarEvents(
         fetchInfo.startStr,
-        fetchInfo.endStr,
+        fetchInfo.endStr
       );
 
       setAllEvents(data);
       return data;
     } catch (error) {
-      console.error("Error cargando actividades:", error);
+      console.error('Error cargando actividades:', error);
       return [];
     } finally {
       setLoading(false);
@@ -43,87 +45,80 @@ export default function MainCalendar() {
 
   return (
     <>
-      <CalendarToolbar
-        view={view}
-        setView={setView}
-        title={title}
-        calendarRef={calendarRef}
-      />
+      <Box sx={{ bgcolor: 'white', borderRadius: 2 }}>
+        <CalendarToolbar
+          view={view}
+          setView={setView}
+          title={title}
+          calendarRef={calendarRef}
+        />
 
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        weekends={false}
-        locale="es"
-        locales={[esLocale]}
-        headerToolbar={false}
-        slotMinTime={"09:00:00"}
-        slotMaxTime={"21:00:00"}
-        scrollTime={"09:00:00"}
-        events={fetchEvents}
-        eventClick={(info) => {
-          setSelectedActivity(info.event.extendedProps.actividad);
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          weekends={false}
+          locale="es"
+          locales={[esLocale]}
+          headerToolbar={false}
+          slotMinTime="09:00:00"
+          slotMaxTime="21:00:00"
+          scrollTime="09:00:00"
+          events={fetchEvents}
+          eventClick={(info) => {
+            setSelectedActivity(info.event.extendedProps.actividad);
+            setSelectedSlot(info.event.extendedProps.slotSeleccionado);
 
-          setSelectedSlot(info.event.extendedProps.slotSeleccionado);
-
-          setAnchorPosition({
-            top: info.jsEvent.clientY,
-
-            left: info.jsEvent.clientX,
-          });
-        }}
-        height="auto"
-        views={{
-          dayGridMonth: {
-            titleFormat: {
-              year: "numeric",
-              month: "long",
+            setAnchorPosition({
+              top: info.jsEvent.clientY,
+              left: info.jsEvent.clientX,
+            });
+          }}
+          height="auto"
+          views={{
+            dayGridMonth: {
+              titleFormat: {
+                year: 'numeric',
+                month: 'long',
+              },
             },
-          },
-
-          timeGridWeek: {
-            titleFormat: {
-              year: "numeric",
-              month: "long",
+            timeGridWeek: {
+              titleFormat: {
+                year: 'numeric',
+                month: 'long',
+              },
             },
-          },
-
-          timeGridDay: {
-            titleFormat: {
-              year: "numeric",
-
-              month: "long",
-
-              day: "numeric",
+            timeGridDay: {
+              titleFormat: {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              },
             },
-          },
-        }}
-        datesSet={(info) => {
-          const raw = info.view.title;
+          }}
+          datesSet={(info) => {
+            const raw = info.view.title;
+            const nextTitle = raw.charAt(0).toUpperCase() + raw.slice(1);
 
-          const nextTitle = raw.charAt(0).toUpperCase() + raw.slice(1);
+            setTitle((currentTitle) =>
+              currentTitle === nextTitle ? currentTitle : nextTitle
+            );
+          }}
+          dayHeaderContent={(arg) => {
+            if (arg.view.type === 'dayGridMonth') {
+              return arg.text.toUpperCase();
+            }
 
-          setTitle((currentTitle) =>
-            currentTitle === nextTitle ? currentTitle : nextTitle,
-          );
-        }}
-        dayHeaderContent={(arg) => {
-          if (arg.view.type === "dayGridMonth") {
-            return arg.text.toUpperCase();
-          }
+            const weekday = arg.date
+              .toLocaleDateString('es-ES', {
+                weekday: 'short',
+              })
+              .toUpperCase();
 
-          const weekday = arg.date
-            .toLocaleDateString("es-ES", {
-              weekday: "short",
-            })
-            .toUpperCase();
-
-          const day = arg.date.getDate();
-
-          return `${weekday} ${day}`;
-        }}
-      />
+            return `${weekday} ${arg.date.getDate()}`;
+          }}
+        />
+      </Box>
 
       <ActivityPopover
         open={Boolean(anchorPosition)}
@@ -132,9 +127,7 @@ export default function MainCalendar() {
         slot={selectedSlot}
         onClose={() => {
           setAnchorPosition(null);
-
           setSelectedActivity(null);
-
           setSelectedSlot(null);
         }}
       />

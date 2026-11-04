@@ -1,10 +1,10 @@
 export async function getCalendarEvents(fechaDesde, fechaHasta) {
   const response = await fetch(
-    `https://localhost:7204/api/v1/Actividades/calendar?fechaDesde=${fechaDesde}&fechaHasta=${fechaHasta}`,
+    `https://localhost:7204/api/v1/Actividades/calendar?fechaDesde=${fechaDesde}&fechaHasta=${fechaHasta}`
   );
 
   if (!response.ok) {
-    throw new Error("Error al obtener actividades");
+    throw new Error('Error al obtener actividades');
   }
 
   const result = await response.json();
@@ -14,18 +14,15 @@ export async function getCalendarEvents(fechaDesde, fechaHasta) {
   const events = [];
 
   for (const actividad of actividades) {
-    for (const slot of actividad.timeSlots) {
-      events.push({
-        id: `${actividad.id}-${slot.inicio}`,
-        title: actividad.tipoActividad,
-        start: slot.inicio,
-        end: slot.fin,
+    events.push({
+      id: `${actividad.id}-${actividad.horario.inicio}`,
+      title: actividad.titulo || actividad.tipoActividad,
+      start: actividad.horario.inicio,
+      end: actividad.horario.fin,
 
-        // Datos que vamos a usar después
-        actividad,
-        slotSeleccionado: slot,
-      });
-    }
+      actividad,
+      slotSeleccionado: actividad.horario,
+    });
   }
 
   return events;

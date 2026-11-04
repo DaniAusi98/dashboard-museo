@@ -8,6 +8,7 @@ import NavigateNextRoundedIcon from "@mui/icons-material/NavigateNextRounded";
 
 const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   margin: theme.spacing(1, 0),
+  backgroundColor: theme.palette.background.paper,
 }));
 
 const routeNames = {

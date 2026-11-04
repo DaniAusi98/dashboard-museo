@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import Divider from "@mui/material/Divider";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemIcon from "@mui/material/ListItemIcon";
+import Divider from '@mui/material/Divider';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
 
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
+import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 
-import MenuButton from "./MenuButton";
+import { useAuth } from '../auth/AuthContext';
+import MenuButton from './MenuButton';
 
-export default function OptionsMenu() {
+export default function OptionsMenu({ onAction }) {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const open = Boolean(anchorEl);
@@ -24,28 +29,47 @@ export default function OptionsMenu() {
     setAnchorEl(null);
   };
 
+  const handleAuthAction = () => {
+    handleClose();
+    if (isAuthenticated) {
+      logout();
+    }
+    onAction?.();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <>
-      <MenuButton aria-label="Open menu" onClick={handleClick}>
+      <MenuButton aria-label="Abrir menú de usuario" onClick={handleClick}>
         <MoreVertRoundedIcon />
       </MenuButton>
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={handleClose}>Perfil</MenuItem>
+        {isAuthenticated && (
+          <>
+            <MenuItem onClick={handleClose}>Perfil</MenuItem>
 
-        <MenuItem onClick={handleClose}>Mi cuenta</MenuItem>
+            <MenuItem onClick={handleClose}>Mi cuenta</MenuItem>
 
-        <Divider />
+            <Divider />
 
-        <MenuItem onClick={handleClose}>Configuración</MenuItem>
+            <MenuItem onClick={handleClose}>Configuración</MenuItem>
 
-        <Divider />
+            <Divider />
+          </>
+        )}
 
-        <MenuItem onClick={handleClose}>
-          <ListItemText>Cerrar sesión</ListItemText>
+        <MenuItem onClick={handleAuthAction}>
+          <ListItemText>
+            {isAuthenticated ? 'Cerrar sesión' : 'Iniciar sesión'}
+          </ListItemText>
 
           <ListItemIcon>
-            <LogoutRoundedIcon fontSize="small" />
+            {isAuthenticated ? (
+              <LogoutRoundedIcon fontSize="small" />
+            ) : (
+              <LoginRoundedIcon fontSize="small" />
+            )}
           </ListItemIcon>
         </MenuItem>
       </Menu>

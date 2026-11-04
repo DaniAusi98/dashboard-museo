@@ -5,10 +5,10 @@ import {
   Select,
   MenuItem,
   Typography,
-} from "@mui/material";
+} from '@mui/material';
 
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 export default function CalendarToolbar({ calendarRef, view, setView, title }) {
   const getApi = () => calendarRef.current?.getApi();
@@ -27,13 +27,26 @@ export default function CalendarToolbar({ calendarRef, view, setView, title }) {
   };
 
   return (
-    <Stack spacing={1}>
+    <Stack
+      spacing={1}
+      sx={{
+        bgcolor: 'white',
+        borderTop: '1px solid',
+        borderLeft: '1px solid',
+        borderRight: '1px solid',
+        borderTopLeftRadius: 2,
+        borderTopRightRadius: 2,
+        borderColor: 'divider',
+        boxSizing: 'border-box',
+        p: 1,
+      }}
+    >
       {/* TITLE arriba SOLO en mobile */}
       <Typography
         variant="h6"
         sx={{
-          fontSize: { xs: "1rem", md: "1.25rem" },
-          display: { xs: "block", md: "none" },
+          fontSize: { xs: '1rem', md: '1.25rem' },
+          display: { xs: 'block', md: 'none' },
         }}
       >
         {title}
@@ -42,30 +55,30 @@ export default function CalendarToolbar({ calendarRef, view, setView, title }) {
       <Stack
         direction="row"
         sx={{
-          justifyContent: "space-between",
-          alignItems: "center",
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         {/* CONTROLES IZQUIERDA */}
-        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Button
             size="small"
             variant="outlined"
             onClick={handleToday}
             sx={{
-              height: "40px",
-              color: "black",
-              borderColor: "grey.400",
-              "&:hover": {
-                borderColor: "black",
-                backgroundColor: "transparent",
+              height: '40px',
+              color: 'black',
+              borderColor: 'grey.400',
+              '&:hover': {
+                borderColor: 'black',
+                backgroundColor: 'transparent',
               },
             }}
           >
             Hoy
           </Button>
 
-          <Stack direction="row" spacing={0} sx={{ alignItems: "center" }}>
+          <Stack direction="row" spacing={0} sx={{ alignItems: 'center' }}>
             <IconButton size="small" onClick={handlePrev}>
               <ChevronLeftIcon />
             </IconButton>
@@ -79,8 +92,8 @@ export default function CalendarToolbar({ calendarRef, view, setView, title }) {
           <Typography
             variant="h6"
             sx={{
-              fontSize: { xs: "1rem", md: "1.25rem" },
-              display: { xs: "none", md: "block" },
+              fontSize: { xs: '1rem', md: '1.25rem' },
+              display: { xs: 'none', md: 'block' },
             }}
           >
             {title}

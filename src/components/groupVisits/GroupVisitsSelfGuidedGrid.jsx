@@ -1,88 +1,96 @@
-import { Box, Typography } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { Box, Typography } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import {
+  getVisitStatusRowClassName,
+  visitStatusGridSx,
+} from './visitStatusGridStyles';
+
+import { useNavigate } from 'react-router-dom';
 
 function formatDate(value) {
-  return new Date(value).toLocaleDateString("es-AR");
+  return new Date(value).toLocaleDateString('es-AR');
 }
 
 function formatTime(value) {
-  return new Date(value).toLocaleTimeString("es-AR", {
-    hour: "2-digit",
-    minute: "2-digit",
+  return new Date(value).toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
     hour12: false,
   });
 }
 
 const columns = [
   {
-    field: "fecha",
-    headerName: "Fecha",
+    field: 'fecha',
+    headerName: 'Fecha',
     width: 120,
     valueGetter: (_, row) => formatDate(row.fechaInicio),
   },
   {
-    field: "horario",
-    headerName: "Horario",
+    field: 'horario',
+    headerName: 'Horario',
     width: 150,
     valueGetter: (_, row) =>
       `${formatTime(row.fechaInicio)} - ${formatTime(row.fechaFin)}`,
   },
   {
-    field: "institucion",
-    headerName: "Institución",
+    field: 'institucion',
+    headerName: 'Institución',
     flex: 1.5,
     minWidth: 160,
-    valueGetter: (_, row) => row.institucion || "-",
+    valueGetter: (_, row) => row.institucion || '-',
   },
   {
-    field: "paisInstitucion",
-    headerName: "País",
+    field: 'paisInstitucion',
+    headerName: 'País',
     flex: 1,
     minWidth: 120,
-    valueGetter: (_, row) => row.paisInstitucion || "-",
+    valueGetter: (_, row) => row.paisInstitucion || '-',
   },
   {
-    field: "provinciaInstitucion",
-    headerName: "Provincia",
+    field: 'provinciaInstitucion',
+    headerName: 'Provincia',
     flex: 1,
     minWidth: 130,
-    valueGetter: (_, row) => row.provinciaInstitucion || "-",
+    valueGetter: (_, row) => row.provinciaInstitucion || '-',
   },
   {
-    field: "ciudadInstitucion",
-    headerName: "Ciudad",
+    field: 'ciudadInstitucion',
+    headerName: 'Ciudad',
     flex: 1,
     minWidth: 130,
-    valueGetter: (_, row) => row.ciudadInstitucion || "-",
+    valueGetter: (_, row) => row.ciudadInstitucion || '-',
   },
   {
-    field: "cantidadPersonas",
-    headerName: "Personas",
+    field: 'cantidadPersonas',
+    headerName: 'Personas',
     width: 110,
-    type: "number",
+    type: 'number',
   },
   {
-    field: "estadoConfirmacion",
-    headerName: "Confirmación",
+    field: 'estadoConfirmacion',
+    headerName: 'Confirmación',
     flex: 1.2,
     minWidth: 170,
-    valueGetter: (_, row) => row.estadoConfirmacion || "-",
+    valueGetter: (_, row) => row.estadoConfirmacion || '-',
   },
   {
-    field: "estado",
-    headerName: "Estado",
+    field: 'estado',
+    headerName: 'Estado',
     flex: 1,
     minWidth: 120,
-    valueGetter: (_, row) => row.estado || "-",
+    valueGetter: (_, row) => row.estado || '-',
   },
 ];
 
 export default function GroupVisitsSelfGuidedGrid({
   rows,
-  title = "Visitas autoguiadas",
+  title = 'Visitas autoguiadas',
 }) {
+  const navigate = useNavigate();
+
   return (
-    <Box sx={{ width: "100%", mt: 3 }}>
+    <Box sx={{ width: '100%', mt: 3 }}>
       <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
         {title}
       </Typography>
@@ -94,6 +102,14 @@ export default function GroupVisitsSelfGuidedGrid({
         disableRowSelectionOnClick
         autoHeight
         hideFooter
+        getRowClassName={getVisitStatusRowClassName}
+        onRowClick={(params) => navigate(`/selfGuidedVisits/${params.row.id}`)}
+        sx={{
+          ...visitStatusGridSx,
+          '& .MuiDataGrid-row': {
+            cursor: 'pointer',
+          },
+        }}
       />
     </Box>
   );

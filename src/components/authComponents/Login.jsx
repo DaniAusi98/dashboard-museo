@@ -1,8 +1,9 @@
-import React from "react";
+import React from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { styled } from "@mui/material/styles";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { styled } from '@mui/material/styles';
 import {
   Box,
   Button,
@@ -14,38 +15,41 @@ import {
   Link,
   Checkbox,
   FormControlLabel,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import ForgotPassword from "./forgotPassword";
-import { Link as RouterLink } from "react-router-dom";
-import MuiCard from "@mui/material/Card";
-import { useAuth } from "../../auth/AuthContext";
-const SignInContainer = styled(Stack)(({ theme }) => ({
-  minHeight: "100vh",
-  justifyContent: "center",
-  alignItems: "center",
-  padding: theme.spacing(2),
-  background: "#f5f7fa",
+} from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
+import ForgotPassword from './forgotPassword';
+import MuiCard from '@mui/material/Card';
+import { useAuth } from '../../auth/AuthContext';
 
-  [theme.breakpoints.up("sm")]: {
+const SignInContainer = styled(Stack)(({ theme }) => ({
+  minHeight: '100vh',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: theme.spacing(2),
+  background: '#f5f7fa',
+
+  [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
   },
 }));
+
 export const SignInCard = styled(MuiCard)({
-  width: "100%",
+  width: '100%',
   maxWidth: 450,
   padding: 32,
-  display: "flex",
-  flexDirection: "column",
+  display: 'flex',
+  flexDirection: 'column',
   gap: 16,
 });
+
 const signInSchema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  email: z.string().email('Email inválido'),
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
 });
 
 export const Login = () => {
   const { login: loginUser } = useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -54,12 +58,15 @@ export const Login = () => {
   } = useForm({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
+
   const [loading, setLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [loginError, setLoginError] = React.useState('');
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -71,10 +78,12 @@ export const Login = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
+      setLoginError('');
 
       await loginUser(data.email, data.password);
+      navigate('/', { replace: true });
     } catch (error) {
-      console.error(error);
+      setLoginError(error.message);
     } finally {
       setLoading(false);
     }
@@ -83,27 +92,28 @@ export const Login = () => {
   return (
     <SignInContainer
       direction="column"
-      sx={{ justifyContent: "space-between" }}
+      sx={{ justifyContent: 'space-between' }}
     >
       <SignInCard>
         <Typography variant="h5" align="center" gutterBottom>
           Iniciar Sesión
         </Typography>
+
         <Box
           component="form"
           onSubmit={handleSubmit(onSubmit)}
           noValidate
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
             gap: 2,
           }}
         >
           <FormControl fullWidth margin="normal">
             <FormLabel>Email</FormLabel>
             <TextField
-              {...register("email")}
+              {...register('email')}
               type="email"
               error={!!errors.email}
               helperText={errors.email?.message}
@@ -116,10 +126,11 @@ export const Login = () => {
               variant="outlined"
             />
           </FormControl>
+
           <FormControl fullWidth margin="normal">
             <FormLabel>Contraseña</FormLabel>
             <TextField
-              {...register("password")}
+              {...register('password')}
               type="password"
               error={!!errors.password}
               helperText={errors.password?.message}
@@ -131,12 +142,19 @@ export const Login = () => {
               fullWidth
               variant="outlined"
             />
+
+            {loginError && (
+              <Typography color="error" variant="body2">
+                {loginError}
+              </Typography>
+            )}
           </FormControl>
 
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
           />
+
           <ForgotPassword open={open} handleClose={handleClose} />
 
           <Button
@@ -146,18 +164,20 @@ export const Login = () => {
             color="primary"
             disabled={loading}
           >
-            {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </Button>
+
           <Link
             component="button"
             type="button"
             onClick={handleClickOpen}
             variant="body2"
-            sx={{ alignSelf: "center" }}
+            sx={{ alignSelf: 'center' }}
           >
             Forgot your password?
           </Link>
         </Box>
+
         {/*<Divider>or</Divider>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Button
@@ -179,8 +199,8 @@ export const Login = () => {
           </Box>
             */}
 
-        <Typography sx={{ textAlign: "center" }}>
-          Don&apos;t have an account?{" "}
+        <Typography sx={{ textAlign: 'center' }}>
+          Don&apos;t have an account?{' '}
           <Link component={RouterLink} to="/signUp" variant="body2">
             Sign up
           </Link>

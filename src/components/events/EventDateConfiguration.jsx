@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import useNotifications from "../hooks/notification/useNotifications";
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import useNotifications from '../hooks/notification/useNotifications';
 
 import {
   Box,
@@ -16,10 +16,10 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Button,
-} from "@mui/material";
+} from '@mui/material';
 
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const EventDateConfiguration = ({
   initialDates,
@@ -31,25 +31,27 @@ const EventDateConfiguration = ({
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaFin, setHoraFin] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
+
   const notifications = useNotifications();
+
   const [todoElDia, setTodoElDia] = useState(false);
 
   // =========================================================
   // SELECT PRINCIPAL DE REPETICIÓN
   // =========================================================
 
-  const [recurrencia, setRecurrencia] = useState("none");
+  const [recurrencia, setRecurrencia] = useState('none');
 
   // =========================================================
   // CONFIGURACIÓN INTERNA DE RECURRENCIA
   // =========================================================
 
   const [recurrenceConfig, setRecurrenceConfig] = useState({
-    tipo: "daily",
+    tipo: 'daily',
     intervalo: 1,
     diasSemana: [],
     tipoMensual: null,
-    finalizacion: "never",
+    finalizacion: 'never',
     fechaFin: null,
     cantidadRepeticiones: null,
   });
@@ -68,17 +70,16 @@ const EventDateConfiguration = ({
       : null;
 
     setFechaInicio(nuevaFechaInicio);
-
     setFechaFin(nuevaFechaInicio);
 
     setHoraInicio(
       initialDates.horaInicio
         ? dayjs(`2000-01-01T${initialDates.horaInicio}`)
-        : null,
+        : null
     );
 
     setHoraFin(
-      initialDates.horaFin ? dayjs(`2000-01-01T${initialDates.horaFin}`) : null,
+      initialDates.horaFin ? dayjs(`2000-01-01T${initialDates.horaFin}`) : null
     );
   }, [initialDates]);
 
@@ -96,10 +97,10 @@ const EventDateConfiguration = ({
     } else if (ahora.minute() < 30) {
       horaInicio = ahora.minute(30);
     } else {
-      horaInicio = ahora.add(1, "hour").minute(0);
+      horaInicio = ahora.add(1, 'hour').minute(0);
     }
 
-    const horaFin = horaInicio.add(1, "hour");
+    const horaFin = horaInicio.add(1, 'hour');
 
     return {
       horaInicio,
@@ -120,13 +121,13 @@ const EventDateConfiguration = ({
     const diaSemana = fechaInicio.day();
 
     const diasSemana = [
-      "domingo",
-      "lunes",
-      "martes",
-      "miércoles",
-      "jueves",
-      "viernes",
-      "sábado",
+      'domingo',
+      'lunes',
+      'martes',
+      'miércoles',
+      'jueves',
+      'viernes',
+      'sábado',
     ];
 
     const nombreDia = diasSemana[diaSemana];
@@ -135,7 +136,7 @@ const EventDateConfiguration = ({
 
     const opciones = [
       {
-        value: "dayOfMonth",
+        value: 'dayOfMonth',
         label: `Cada mes el ${diaDelMes}`,
       },
     ];
@@ -146,14 +147,14 @@ const EventDateConfiguration = ({
 
     if (posicion >= 1 && posicion <= 4) {
       const posiciones = {
-        1: "primer",
-        2: "segundo",
-        3: "tercer",
-        4: "cuarto",
+        1: 'primer',
+        2: 'segundo',
+        3: 'tercer',
+        4: 'cuarto',
       };
 
       opciones.push({
-        value: "weekdayPosition",
+        value: 'weekdayPosition',
         label: `Cada mes el ${posiciones[posicion]} ${nombreDia}`,
       });
     }
@@ -162,13 +163,13 @@ const EventDateConfiguration = ({
     // ÚLTIMA APARICIÓN DEL DÍA DE SEMANA
     // ---------------------------------------------------------
 
-    const siguienteSemana = fechaInicio.add(7, "day");
+    const siguienteSemana = fechaInicio.add(7, 'day');
 
     const esUltimaAparicion = siguienteSemana.month() !== fechaInicio.month();
 
     if (esUltimaAparicion) {
       opciones.push({
-        value: "lastWeekday",
+        value: 'lastWeekday',
         label: `Cada mes el último ${nombreDia}`,
       });
     }
@@ -184,20 +185,20 @@ const EventDateConfiguration = ({
     if (!fechaInicio) {
       return [
         {
-          value: "none",
-          label: "No se repite",
+          value: 'none',
+          label: 'No se repite',
         },
       ];
     }
 
     const opciones = [
       {
-        value: "none",
-        label: "No se repite",
+        value: 'none',
+        label: 'No se repite',
       },
       {
-        value: "daily",
-        label: "Cada día",
+        value: 'daily',
+        label: 'Cada día',
       },
     ];
 
@@ -206,17 +207,17 @@ const EventDateConfiguration = ({
     // ---------------------------------------------------------
 
     const nombresDias = {
-      0: "domingo",
-      1: "lunes",
-      2: "martes",
-      3: "miércoles",
-      4: "jueves",
-      5: "viernes",
-      6: "sábado",
+      0: 'domingo',
+      1: 'lunes',
+      2: 'martes',
+      3: 'miércoles',
+      4: 'jueves',
+      5: 'viernes',
+      6: 'sábado',
     };
 
     opciones.push({
-      value: "weekly",
+      value: 'weekly',
       label: `Cada semana el ${nombresDias[fechaInicio.day()]}`,
     });
 
@@ -229,16 +230,16 @@ const EventDateConfiguration = ({
         let value;
 
         switch (opcion.value) {
-          case "dayOfMonth":
-            value = "monthly-day";
+          case 'dayOfMonth':
+            value = 'monthly-day';
             break;
 
-          case "weekdayPosition":
-            value = "monthly-weekday";
+          case 'weekdayPosition':
+            value = 'monthly-weekday';
             break;
 
-          case "lastWeekday":
-            value = "monthly-last-weekday";
+          case 'lastWeekday':
+            value = 'monthly-last-weekday';
             break;
 
           default:
@@ -249,8 +250,17 @@ const EventDateConfiguration = ({
           value,
           label: opcion.label,
         };
-      }),
+      })
     );
+
+    // ---------------------------------------------------------
+    // PERSONALIZAR
+    // ---------------------------------------------------------
+
+    opciones.push({
+      value: 'custom',
+      label: 'Personalizar',
+    });
 
     return opciones;
   };
@@ -266,14 +276,14 @@ const EventDateConfiguration = ({
     // NO SE REPITE
     // ---------------------------------------------------------
 
-    if (value === "none") {
+    if (value === 'none') {
       setRecurrenceConfig((prev) => ({
         ...prev,
-        tipo: "daily",
+        tipo: 'daily',
         intervalo: 1,
         diasSemana: [],
         tipoMensual: null,
-        finalizacion: "never",
+        finalizacion: 'never',
         fechaFin: null,
         cantidadRepeticiones: null,
       }));
@@ -285,10 +295,10 @@ const EventDateConfiguration = ({
     // CADA DÍA
     // ---------------------------------------------------------
 
-    if (value === "daily") {
+    if (value === 'daily') {
       setRecurrenceConfig((prev) => ({
         ...prev,
-        tipo: "daily",
+        tipo: 'daily',
         intervalo: 1,
         diasSemana: [],
         tipoMensual: null,
@@ -301,12 +311,12 @@ const EventDateConfiguration = ({
     // CADA SEMANA EL DÍA DE INICIO
     // ---------------------------------------------------------
 
-    if (value === "weekly") {
-      const diasSemana = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+    if (value === 'weekly') {
+      const diasSemana = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
       setRecurrenceConfig((prev) => ({
         ...prev,
-        tipo: "weekly",
+        tipo: 'weekly',
         intervalo: 1,
         diasSemana: [diasSemana[fechaInicio.day()]],
         tipoMensual: null,
@@ -319,13 +329,13 @@ const EventDateConfiguration = ({
     // CADA MES EL DÍA DEL MES
     // ---------------------------------------------------------
 
-    if (value === "monthly-day") {
+    if (value === 'monthly-day') {
       setRecurrenceConfig((prev) => ({
         ...prev,
-        tipo: "monthly",
+        tipo: 'monthly',
         intervalo: 1,
         diasSemana: [],
-        tipoMensual: "dayOfMonth",
+        tipoMensual: 'dayOfMonth',
       }));
 
       return;
@@ -335,13 +345,13 @@ const EventDateConfiguration = ({
     // CADA MES EL N-ÉSIMO DÍA DE SEMANA
     // ---------------------------------------------------------
 
-    if (value === "monthly-weekday") {
+    if (value === 'monthly-weekday') {
       setRecurrenceConfig((prev) => ({
         ...prev,
-        tipo: "monthly",
+        tipo: 'monthly',
         intervalo: 1,
         diasSemana: [],
-        tipoMensual: "weekdayPosition",
+        tipoMensual: 'weekdayPosition',
       }));
 
       return;
@@ -351,13 +361,29 @@ const EventDateConfiguration = ({
     // CADA MES EL ÚLTIMO DÍA DE SEMANA
     // ---------------------------------------------------------
 
-    if (value === "monthly-last-weekday") {
+    if (value === 'monthly-last-weekday') {
       setRecurrenceConfig((prev) => ({
         ...prev,
-        tipo: "monthly",
+        tipo: 'monthly',
         intervalo: 1,
         diasSemana: [],
-        tipoMensual: "lastWeekday",
+        tipoMensual: 'lastWeekday',
+      }));
+
+      return;
+    }
+
+    // ---------------------------------------------------------
+    // PERSONALIZAR
+    // ---------------------------------------------------------
+
+    if (value === 'custom') {
+      setRecurrenceConfig((prev) => ({
+        ...prev,
+        tipo: 'daily',
+        intervalo: 1,
+        diasSemana: [],
+        tipoMensual: null,
       }));
     }
   };
@@ -367,117 +393,165 @@ const EventDateConfiguration = ({
   // =========================================================
 
   const construirRRule = () => {
-    if (!fechaInicio || recurrencia === "none") {
-      return "";
+    if (!fechaInicio || recurrencia === 'none') {
+      return '';
     }
 
-    const partes = [];
+    // =========================================================
+    // PRESETS
+    // =========================================================
 
-    // ---------------------------------------------------------
-    // FRECUENCIA
-    // ---------------------------------------------------------
-
-    switch (recurrenceConfig.tipo) {
-      case "daily":
-        partes.push("FREQ=DAILY");
-        break;
-
-      case "weekly":
-        partes.push("FREQ=WEEKLY");
-        break;
-
-      case "monthly":
-        partes.push("FREQ=MONTHLY");
-        break;
-
-      default:
-        return "";
+    if (recurrencia === 'daily') {
+      return 'FREQ=DAILY';
     }
 
-    // ---------------------------------------------------------
-    // INTERVALO
-    // ---------------------------------------------------------
+    if (recurrencia === 'weekly') {
+      const dia = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][fechaInicio.day()];
 
-    if (recurrenceConfig.intervalo > 1) {
-      partes.push(`INTERVAL=${recurrenceConfig.intervalo}`);
+      return `FREQ=WEEKLY;BYDAY=${dia}`;
     }
 
-    // ---------------------------------------------------------
-    // SEMANAL
-    // ---------------------------------------------------------
-
-    if (recurrenceConfig.tipo === "weekly") {
-      const dias = recurrenceConfig.diasSemana;
-
-      if (dias.length > 0) {
-        partes.push(`BYDAY=${dias.join(",")}`);
-      }
+    if (recurrencia === 'monthly-day') {
+      return `FREQ=MONTHLY;BYMONTHDAY=${fechaInicio.date()}`;
     }
 
-    // ---------------------------------------------------------
-    // MENSUAL
-    // ---------------------------------------------------------
+    if (recurrencia === 'monthly-weekday') {
+      const dia = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][fechaInicio.day()];
 
-    if (recurrenceConfig.tipo === "monthly") {
-      if (recurrenceConfig.tipoMensual === "dayOfMonth") {
-        partes.push(`BYMONTHDAY=${fechaInicio.date()}`);
-      }
+      const posicion = Math.ceil(fechaInicio.date() / 7);
 
-      if (recurrenceConfig.tipoMensual === "weekdayPosition") {
-        const diasSemana = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+      return `FREQ=MONTHLY;BYDAY=${posicion}${dia}`;
+    }
 
-        const codigoDia = diasSemana[fechaInicio.day()];
+    if (recurrencia === 'monthly-last-weekday') {
+      const dia = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][fechaInicio.day()];
 
-        const posicion = Math.ceil(fechaInicio.date() / 7);
+      return `FREQ=MONTHLY;BYDAY=-1${dia}`;
+    }
 
-        partes.push(`BYDAY=${posicion}${codigoDia}`);
+    // =========================================================
+    // PERSONALIZADA
+    // =========================================================
+
+    if (recurrencia === 'custom') {
+      const partes = [];
+
+      // -------------------------------------------------------
+      // FRECUENCIA
+      // -------------------------------------------------------
+
+      switch (recurrenceConfig.tipo) {
+        case 'daily':
+          partes.push('FREQ=DAILY');
+          break;
+
+        case 'weekly':
+          partes.push('FREQ=WEEKLY');
+          break;
+
+        case 'monthly':
+          partes.push('FREQ=MONTHLY');
+          break;
+
+        default:
+          return '';
       }
 
-      if (recurrenceConfig.tipoMensual === "lastWeekday") {
-        const diasSemana = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+      // -------------------------------------------------------
+      // INTERVALO
+      // -------------------------------------------------------
 
-        const codigoDia = diasSemana[fechaInicio.day()];
-
-        partes.push(`BYDAY=-1${codigoDia}`);
+      if (recurrenceConfig.intervalo > 1) {
+        partes.push(`INTERVAL=${recurrenceConfig.intervalo}`);
       }
+
+      // -------------------------------------------------------
+      // SEMANAL
+      // -------------------------------------------------------
+
+      if (recurrenceConfig.tipo === 'weekly') {
+        const dias = recurrenceConfig.diasSemana;
+
+        if (dias.length > 0) {
+          partes.push(`BYDAY=${dias.join(',')}`);
+        }
+      }
+
+      // -------------------------------------------------------
+      // MENSUAL
+      // -------------------------------------------------------
+
+      if (recurrenceConfig.tipo === 'monthly') {
+        if (recurrenceConfig.tipoMensual === 'dayOfMonth') {
+          partes.push(`BYMONTHDAY=${fechaInicio.date()}`);
+        }
+
+        if (recurrenceConfig.tipoMensual === 'weekdayPosition') {
+          const diasSemana = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+          const codigoDia = diasSemana[fechaInicio.day()];
+
+          const posicion = Math.ceil(fechaInicio.date() / 7);
+
+          partes.push(`BYDAY=${posicion}${codigoDia}`);
+        }
+
+        if (recurrenceConfig.tipoMensual === 'lastWeekday') {
+          const diasSemana = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+          const codigoDia = diasSemana[fechaInicio.day()];
+
+          partes.push(`BYDAY=-1${codigoDia}`);
+        }
+      }
+
+      // -------------------------------------------------------
+      // FINALIZACIÓN POR FECHA
+      // -------------------------------------------------------
+
+      if (
+        recurrenceConfig.finalizacion === 'date' &&
+        recurrenceConfig.fechaFin
+      ) {
+        partes.push(`UNTIL=${recurrenceConfig.fechaFin.format('YYYYMMDD')}`);
+      }
+
+      // -------------------------------------------------------
+      // FINALIZACIÓN POR CANTIDAD
+      // -------------------------------------------------------
+
+      if (
+        recurrenceConfig.finalizacion === 'count' &&
+        recurrenceConfig.cantidadRepeticiones
+      ) {
+        partes.push(`COUNT=${recurrenceConfig.cantidadRepeticiones}`);
+      }
+
+      return partes.join(';');
     }
 
-    // ---------------------------------------------------------
-    // FINALIZACIÓN POR FECHA
-    // ---------------------------------------------------------
-
-    if (recurrenceConfig.finalizacion === "date" && recurrenceConfig.fechaFin) {
-      partes.push(`UNTIL=${recurrenceConfig.fechaFin.format("YYYYMMDD")}`);
-    }
-
-    // ---------------------------------------------------------
-    // FINALIZACIÓN POR CANTIDAD
-    // ---------------------------------------------------------
-
-    if (
-      recurrenceConfig.finalizacion === "count" &&
-      recurrenceConfig.cantidadRepeticiones
-    ) {
-      partes.push(`COUNT=${recurrenceConfig.cantidadRepeticiones}`);
-    }
-
-    return partes.join(";");
+    return '';
   };
+
+  // =========================================================
+  // VALIDAR DISPONIBILIDAD
+  // =========================================================
+
   const validarDisponibilidad = () => {
     if (!fechaInicio || !fechaFin || !horaInicio || !horaFin) {
       notifications.error(
-        "Las fechas y horarios seleccionados no son válidos.",
+        'Las fechas y horarios seleccionados no son válidos.'
       );
 
       return false;
     }
 
     const inicioSeleccionado = dayjs(
-      `${fechaInicio.format("YYYY-MM-DD")}T${horaInicio.format("HH:mm")}`,
+      `${fechaInicio.format('YYYY-MM-DD')}T${horaInicio.format('HH:mm')}`
     );
 
     const finSeleccionado = dayjs(
-      `${fechaFin.format("YYYY-MM-DD")}T${horaFin.format("HH:mm")}`,
+      `${fechaFin.format('YYYY-MM-DD')}T${horaFin.format('HH:mm')}`
     );
 
     // ---------------------------------------------------------
@@ -486,11 +560,11 @@ const EventDateConfiguration = ({
 
     if (!finSeleccionado.isAfter(inicioSeleccionado)) {
       notifications.error(
-        "Las fechas y horarios seleccionados no son válidos. " +
-          "La fecha y hora de finalización debe ser posterior a la de inicio.",
+        'Las fechas y horarios seleccionados no son válidos. ' +
+          'La fecha y hora de finalización debe ser posterior a la de inicio.',
         {
           autoHideDuration: 5000,
-        },
+        }
       );
 
       return false;
@@ -527,13 +601,14 @@ const EventDateConfiguration = ({
     const inicioConflicto = dayjs(conflicto.inicio);
     const finConflicto = dayjs(conflicto.fin);
 
-    const fechaConflicto = inicioConflicto.format("DD/MM/YYYY");
+    const fechaConflicto = inicioConflicto.format('DD/MM/YYYY');
+
     const horarioConflicto = `${inicioConflicto.format(
-      "HH:mm",
-    )} - ${finConflicto.format("HH:mm")}`;
+      'HH:mm'
+    )} - ${finConflicto.format('HH:mm')}`;
 
     const mensajeConflicto =
-      conflicto.mensaje || "Existe un período no disponible.";
+      conflicto.mensaje || 'Existe un período no disponible.';
 
     notifications.error(
       `Las fechas y horarios seleccionados no son válidos. ` +
@@ -541,11 +616,12 @@ const EventDateConfiguration = ({
         `${mensajeConflicto}`,
       {
         autoHideDuration: 7000,
-      },
+      }
     );
 
     return false;
   };
+
   // =========================================================
   // GUARDAR CONFIGURACIÓN
   // =========================================================
@@ -558,18 +634,18 @@ const EventDateConfiguration = ({
     }
 
     const configuracion = {
-      fechaInicio: fechaInicio ? fechaInicio.format("YYYY-MM-DD") : null,
+      fechaInicio: fechaInicio ? fechaInicio.format('YYYY-MM-DD') : null,
 
-      horaInicio: horaInicio ? horaInicio.format("HH:mm") : null,
+      horaInicio: horaInicio ? horaInicio.format('HH:mm') : null,
 
-      horaFin: horaFin ? horaFin.format("HH:mm") : null,
+      horaFin: horaFin ? horaFin.format('HH:mm') : null,
 
-      fechaFin: fechaFin ? fechaFin.format("YYYY-MM-DD") : null,
+      fechaFin: fechaFin ? fechaFin.format('YYYY-MM-DD') : null,
 
       recurrencia: construirRRule(),
     };
 
-    console.log("Configuración enviada al padre:", configuracion);
+    console.log('Configuración enviada al padre:', configuracion);
 
     onEventConfigurationChange(configuracion);
   };
@@ -585,13 +661,13 @@ const EventDateConfiguration = ({
       ===================================================== */}
 
       <Stack
-        direction={{ xs: "column", sm: "row" }}
+        direction={{ xs: 'column', sm: 'row' }}
         spacing={2}
         sx={{
-          width: "100%",
+          width: '100%',
           alignItems: {
-            xs: "stretch",
-            sm: "center",
+            xs: 'stretch',
+            sm: 'center',
           },
         }}
       >
@@ -605,7 +681,7 @@ const EventDateConfiguration = ({
           }}
           sx={{
             width: {
-              xs: "100%",
+              xs: '100%',
               sm: 212,
             },
           }}
@@ -632,11 +708,11 @@ const EventDateConfiguration = ({
             slotProps={{
               field: {
                 sx: {
-                  width: "120px",
+                  width: '120px',
                 },
               },
               textField: {
-                placeholder: "HH:mm",
+                placeholder: 'HH:mm',
               },
             }}
           />
@@ -658,11 +734,11 @@ const EventDateConfiguration = ({
             slotProps={{
               field: {
                 sx: {
-                  width: "120px",
+                  width: '120px',
                 },
               },
               textField: {
-                placeholder: "HH:mm",
+                placeholder: 'HH:mm',
               },
             }}
           />
@@ -678,7 +754,7 @@ const EventDateConfiguration = ({
           }}
           sx={{
             width: {
-              xs: "100%",
+              xs: '100%',
               sm: 212,
             },
           }}
@@ -705,8 +781,9 @@ const EventDateConfiguration = ({
                 setTodoElDia(checked);
 
                 if (checked) {
-                  setHoraInicio(dayjs("2000-01-01T00:00"));
-                  setHoraFin(dayjs("2000-01-01T23:59"));
+                  setHoraInicio(dayjs('2000-01-01T00:00'));
+
+                  setHoraFin(dayjs('2000-01-01T23:59'));
                 } else {
                   const { horaInicio, horaFin } = obtenerHorarioPorDefecto();
 
@@ -744,10 +821,10 @@ const EventDateConfiguration = ({
       </FormControl>
 
       {/* =====================================================
-          CONFIGURACIÓN DE RECURRENCIA
+          CONFIGURACIÓN PERSONALIZADA DE RECURRENCIA
       ===================================================== */}
 
-      {recurrencia !== "none" && (
+      {recurrencia === 'custom' && (
         <>
           {/* =================================================
               INTERVALO + TIPO
@@ -757,7 +834,7 @@ const EventDateConfiguration = ({
             direction="row"
             spacing={1}
             sx={{
-              alignItems: "center",
+              alignItems: 'center',
               mt: 2,
             }}
           >
@@ -814,7 +891,7 @@ const EventDateConfiguration = ({
               CONFIGURACIÓN SEMANAL
           ================================================= */}
 
-          {recurrenceConfig.tipo === "weekly" && (
+          {recurrenceConfig.tipo === 'weekly' && (
             <Box sx={{ mt: 2 }}>
               <ToggleButtonGroup
                 value={recurrenceConfig.diasSemana}
@@ -847,7 +924,7 @@ const EventDateConfiguration = ({
               CONFIGURACIÓN MENSUAL
           ================================================= */}
 
-          {recurrenceConfig.tipo === "monthly" && (
+          {recurrenceConfig.tipo === 'monthly' && (
             <Box sx={{ mt: 2 }}>
               <FormControl fullWidth>
                 <InputLabel id="tipo-mensual-label">
@@ -856,7 +933,7 @@ const EventDateConfiguration = ({
 
                 <Select
                   labelId="tipo-mensual-label"
-                  value={recurrenceConfig.tipoMensual ?? ""}
+                  value={recurrenceConfig.tipoMensual ?? ''}
                   label="Repetición mensual"
                   onChange={(event) => {
                     setRecurrenceConfig((prev) => ({
@@ -890,11 +967,11 @@ const EventDateConfiguration = ({
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={recurrenceConfig.finalizacion === "never"}
+                    checked={recurrenceConfig.finalizacion === 'never'}
                     onChange={() => {
                       setRecurrenceConfig((prev) => ({
                         ...prev,
-                        finalizacion: "never",
+                        finalizacion: 'never',
                         fechaFin: null,
                         cantidadRepeticiones: null,
                       }));
@@ -909,17 +986,17 @@ const EventDateConfiguration = ({
               <Stack
                 direction="row"
                 sx={{
-                  alignItems: "center",
+                  alignItems: 'center',
                 }}
               >
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={recurrenceConfig.finalizacion === "date"}
+                      checked={recurrenceConfig.finalizacion === 'date'}
                       onChange={() => {
                         setRecurrenceConfig((prev) => ({
                           ...prev,
-                          finalizacion: "date",
+                          finalizacion: 'date',
                           cantidadRepeticiones: null,
                         }));
                       }}
@@ -936,10 +1013,10 @@ const EventDateConfiguration = ({
                       fechaFin: newValue,
                     }));
                   }}
-                  disabled={recurrenceConfig.finalizacion !== "date"}
+                  disabled={recurrenceConfig.finalizacion !== 'date'}
                   slotProps={{
                     textField: {
-                      size: "small",
+                      size: 'small',
                     },
                   }}
                 />
@@ -950,17 +1027,17 @@ const EventDateConfiguration = ({
               <Stack
                 direction="row"
                 sx={{
-                  alignItems: "center",
+                  alignItems: 'center',
                 }}
               >
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={recurrenceConfig.finalizacion === "count"}
+                      checked={recurrenceConfig.finalizacion === 'count'}
                       onChange={() => {
                         setRecurrenceConfig((prev) => ({
                           ...prev,
-                          finalizacion: "count",
+                          finalizacion: 'count',
                           fechaFin: null,
                         }));
                       }}
@@ -971,16 +1048,16 @@ const EventDateConfiguration = ({
 
                 <TextField
                   type="number"
-                  value={recurrenceConfig.cantidadRepeticiones ?? ""}
+                  value={recurrenceConfig.cantidadRepeticiones ?? ''}
                   onChange={(event) => {
                     const valor = event.target.value;
 
                     setRecurrenceConfig((prev) => ({
                       ...prev,
-                      cantidadRepeticiones: valor === "" ? null : Number(valor),
+                      cantidadRepeticiones: valor === '' ? null : Number(valor),
                     }));
                   }}
-                  disabled={recurrenceConfig.finalizacion !== "count"}
+                  disabled={recurrenceConfig.finalizacion !== 'count'}
                   size="small"
                   slotProps={{
                     htmlInput: {
@@ -1007,8 +1084,8 @@ const EventDateConfiguration = ({
       <Box
         sx={{
           mt: 3,
-          display: "flex",
-          justifyContent: "flex-end",
+          display: 'flex',
+          justifyContent: 'flex-end',
         }}
       >
         <Button variant="contained" onClick={guardarConfiguracion}>

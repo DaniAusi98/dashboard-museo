@@ -1,15 +1,15 @@
-import { Box, Stack } from "@mui/material";
-import { Outlet } from "react-router-dom";
+import { Box, Stack } from '@mui/material';
+import { Outlet } from 'react-router-dom';
 
-import Typography from "@mui/material/Typography";
+import Typography from '@mui/material/Typography';
 
-import SideMenu from "./SideMenu";
-import AppNavbar from "./AppNavbarMobile";
-import Header from "./Header";
+import SideMenu from './SideMenu';
+import AppNavbar from './AppNavbarMobile';
+import Header from './Header';
 
 export default function DashboardLayout() {
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: 'flex' }}>
       <SideMenu />
       <AppNavbar />
 
@@ -17,9 +17,11 @@ export default function DashboardLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          overflow: "auto",
+          overflow: 'auto',
         }}
       >
+        <Header />
+
         <Stack
           spacing={2}
           sx={{
@@ -31,12 +33,10 @@ export default function DashboardLayout() {
             pb: 5,
             mt: {
               xs: 8,
-              md: 0,
+              md: 4,
             },
           }}
         >
-          <Header />
-
           <Outlet />
         </Stack>
       </Box>

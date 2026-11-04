@@ -1,9 +1,9 @@
-import Stack from "@mui/material/Stack";
+import Stack from '@mui/material/Stack';
 
-import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
+import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 
-import NavbarBreadcrumbs from "./NavbarBreadcrumbs";
-import MenuButton from "./MenuButton";
+import NavbarBreadcrumbs from './NavbarBreadcrumbs';
+import MenuButton from './MenuButton';
 
 export default function Header() {
   return (
@@ -12,13 +12,18 @@ export default function Header() {
       spacing={2}
       sx={{
         display: {
-          xs: "none",
-          md: "flex",
+          xs: 'none',
+          md: 'flex',
         },
-        width: "100%",
-        justifyContent: "space-between",
-        alignItems: "center",
-        pt: 2,
+        width: '100%',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        pt: 1,
+        bgcolor: 'background.paper',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        boxSizing: 'border-box',
+        px: 2,
       }}
     >
       <NavbarBreadcrumbs />

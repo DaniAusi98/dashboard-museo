@@ -1,65 +1,70 @@
-import { Box, Typography } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { Box, Typography } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+
+import {
+  getVisitStatusRowClassName,
+  visitStatusGridSx,
+} from './visitStatusGridStyles';
 
 function formatDate(value) {
-  return new Date(value).toLocaleDateString("es-AR");
+  return new Date(value).toLocaleDateString('es-AR');
 }
 
 function formatTime(value) {
-  return new Date(value).toLocaleTimeString("es-AR", {
-    hour: "2-digit",
-    minute: "2-digit",
+  return new Date(value).toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
     hour12: false,
   });
 }
 
 const columns = [
   {
-    field: "tipo",
-    headerName: "Tipo",
+    field: 'tipo',
+    headerName: 'Tipo',
     flex: 1,
     minWidth: 120,
     valueGetter: (_, row) => row.visit.tipo,
   },
   {
-    field: "fecha",
-    headerName: "Fecha",
+    field: 'fecha',
+    headerName: 'Fecha',
     width: 120,
     valueGetter: (_, row) => formatDate(row.visit.horaInicio),
   },
   {
-    field: "horario",
-    headerName: "Horario",
+    field: 'horario',
+    headerName: 'Horario',
     width: 150,
     valueGetter: (_, row) =>
       `${formatTime(row.visit.horaInicio)} - ${formatTime(row.visit.horaFin)}`,
   },
   {
-    field: "institucion",
-    headerName: "Institución",
+    field: 'institucion',
+    headerName: 'Institución',
     flex: 1.5,
     minWidth: 160,
-    valueGetter: (_, row) => row.visit.institucion || "-",
+    valueGetter: (_, row) => row.visit.institucion || '-',
   },
   {
-    field: "cantidadPersonas",
-    headerName: "Cantidad de personas",
+    field: 'cantidadPersonas',
+    headerName: 'Cantidad de personas',
     width: 170,
-    type: "number",
+    type: 'number',
     valueGetter: (_, row) => row.visit.cantidadPersonas,
   },
   {
-    field: "estado",
-    headerName: "Estado",
+    field: 'estado',
+    headerName: 'Estado',
     flex: 1.2,
     minWidth: 180,
-    valueGetter: (_, row) => row.visit.estado || "Pendiente de confirmar",
+    valueGetter: (_, row) => row.visit.estado || 'Pendiente de confirmar',
   },
 ];
 
-export default function GroupVisitsGrid({ rows, title = "Visitas grupales" }) {
+export default function GroupVisitsGrid({ rows, title = 'Visitas grupales' }) {
   return (
-    <Box sx={{ width: "100%", mt: 3 }}>
+    <Box sx={{ width: '100%', mt: 3 }}>
       <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
         {title}
       </Typography>
@@ -70,6 +75,13 @@ export default function GroupVisitsGrid({ rows, title = "Visitas grupales" }) {
         disableRowSelectionOnClick
         autoHeight
         hideFooter
+        getRowClassName={getVisitStatusRowClassName}
+        sx={{
+          ...visitStatusGridSx,
+          '& .MuiDataGrid-row': {
+            cursor: 'pointer',
+          },
+        }}
       />
     </Box>
   );

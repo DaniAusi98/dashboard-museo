@@ -1,6 +1,6 @@
-import React from "react";
-import { Box, Divider, IconButton, Popover, Typography } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import React from 'react';
+import { Box, Divider, IconButton, Popover, Typography } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 const EventConfigurationPopper = ({ open, position, onClose, children }) => {
   return (
@@ -8,21 +8,22 @@ const EventConfigurationPopper = ({ open, position, onClose, children }) => {
       open={open}
       onClose={onClose}
       anchorReference="anchorPosition"
+      disableRestoreFocus
       anchorPosition={position ?? undefined}
       anchorOrigin={{
-        vertical: "center",
-        horizontal: "center",
+        vertical: 'center',
+        horizontal: 'center',
       }}
       transformOrigin={{
-        vertical: "center",
-        horizontal: "center",
+        vertical: 'center',
+        horizontal: 'center',
       }}
     >
       <Box
         sx={{
           width: 700,
-          maxHeight: "80vh",
-          overflow: "auto",
+          maxHeight: '80vh',
+          overflow: 'auto',
           borderRadius: 2,
         }}
       >
@@ -30,9 +31,9 @@ const EventConfigurationPopper = ({ open, position, onClose, children }) => {
 
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             px: 2,
             py: 1.5,
           }}

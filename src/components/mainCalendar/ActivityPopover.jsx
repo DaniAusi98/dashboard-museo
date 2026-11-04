@@ -1,4 +1,4 @@
-import { Popover, Box, Typography, Divider, Button } from "@mui/material";
+import { Popover, Box, Typography, Divider, Button } from '@mui/material';
 
 export default function ActivityPopover({
   open,
@@ -30,9 +30,9 @@ export default function ActivityPopover({
 
         <Typography fontWeight="bold">Horario</Typography>
 
-        <Typography>Inicio: {slot?.inicio}</Typography>
+        <Typography>Inicio: {slot?.inicio?.replace('T', '  ')}</Typography>
 
-        <Typography>Fin: {slot?.fin}</Typography>
+        <Typography>Fin: {slot?.fin?.replace('T', '  ')}</Typography>
 
         <Divider sx={{ my: 1 }} />
 
@@ -54,7 +54,7 @@ export default function ActivityPopover({
           activity.recursos.map((recurso) => (
             <Typography key={recurso.recursoId}>
               • {recurso.nombreRecurso}
-              {recurso.cantidadAsignada ? ` (${recurso.cantidadAsignada})` : ""}
+              {recurso.cantidadAsignada ? ` (${recurso.cantidadAsignada})` : ''}
             </Typography>
           ))
         ) : (

@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { BarChart } from "@mui/x-charts/BarChart";
+import { BarChart } from '@mui/x-charts/BarChart';
 
-import { getVisitorsByRoom } from "./groupVisitsReportService";
+import { getVisitorsByRoom } from './groupVisitsReportService';
 
 export default function VisitorsByRoomReport({ fechaDesde, fechaHasta }) {
   const [data, setData] = useState([]);
 
-  const isMobile = useMediaQuery("(max-width:600px)");
+  const isMobile = useMediaQuery('(max-width:600px)');
 
   const axisWidth = isMobile ? 80 : 140;
 
@@ -23,15 +23,15 @@ export default function VisitorsByRoomReport({ fechaDesde, fechaHasta }) {
 
       try {
         const response = await getVisitorsByRoom(
-          fechaDesde.format("YYYY-MM-DD"),
-          fechaHasta.format("YYYY-MM-DD"),
+          fechaDesde.format('YYYY-MM-DD'),
+          fechaHasta.format('YYYY-MM-DD')
         );
 
         setData(response.data);
       } catch (error) {
         console.error(
-          "Error al cargar el reporte de visitantes por sala:",
-          error,
+          'Error al cargar el reporte de visitantes por sala:',
+          error
         );
       }
     };
@@ -46,7 +46,15 @@ export default function VisitorsByRoomReport({ fechaDesde, fechaHasta }) {
   }
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box
+      sx={{
+        width: '100%',
+        backgroundColor: 'white',
+        borderRadius: 2,
+        p: 2,
+        mt: 3,
+      }}
+    >
       <Typography variant="h6" sx={{ mb: 2 }}>
         Visitantes por sala
       </Typography>
@@ -61,8 +69,8 @@ export default function VisitorsByRoomReport({ fechaDesde, fechaHasta }) {
         }}
         yAxis={[
           {
-            scaleType: "band",
-            dataKey: "nombreSala",
+            scaleType: 'band',
+            dataKey: 'nombreSala',
             width: axisWidth,
           },
         ]}
@@ -75,8 +83,8 @@ export default function VisitorsByRoomReport({ fechaDesde, fechaHasta }) {
         ]}
         series={[
           {
-            dataKey: "cantidadVisitantes",
-            label: "Visitantes",
+            dataKey: 'cantidadVisitantes',
+            label: 'Visitantes',
           },
         ]}
       />

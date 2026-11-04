@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Checkbox,
@@ -7,35 +7,25 @@ import {
   Typography,
   Divider,
   Stack,
-} from "@mui/material";
+} from '@mui/material';
 
 const TIPOS_RECURSO = [
-  {
-    value: "Mobiliario",
-    label: "Mobiliario",
-  },
-  {
-    value: "Tecnologico",
-    label: "Tecnológico",
-  },
-  {
-    value: "Audiovisual",
-    label: "Audiovisual",
-  },
+  { value: 'Mobiliario', label: 'Mobiliario' },
+  { value: 'Tecnologico', label: 'Tecnológico' },
+  { value: 'Audiovisual', label: 'Audiovisual' },
 ];
 
 const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
+  console.log('RENDER RECURSOS');
+
   const recursosSeleccionados = value || [];
 
-  const estaSeleccionado = (recursoId) => {
-    return recursosSeleccionados.some(
-      (recurso) => recurso.RecursoId === recursoId,
-    );
-  };
+  const estaSeleccionado = (recursoId) =>
+    recursosSeleccionados.some((recurso) => recurso.RecursoId === recursoId);
 
   const obtenerCantidad = (recursoId) => {
     const recursoSeleccionado = recursosSeleccionados.find(
-      (recurso) => recurso.RecursoId === recursoId,
+      (recurso) => recurso.RecursoId === recursoId
     );
 
     return recursoSeleccionado?.CantidadAsignada ?? 1;
@@ -56,28 +46,29 @@ const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
 
     onChange(
       recursosSeleccionados.filter(
-        (item) => item.RecursoId !== recurso.recursoId,
-      ),
+        (item) => item.RecursoId !== recurso.recursoId
+      )
     );
   };
 
   const handleCantidadChange = (recurso, valorTexto) => {
-    // Si borra el input por completo, le mandamos un 0 provisorio al padre
-    // para cumplir con la restricción numérica, pero permitimos limpiar la pantalla.
-    if (valorTexto === "") {
+    if (valorTexto === '') {
       onChange(
         recursosSeleccionados.map((item) =>
           item.RecursoId === recurso.recursoId
-            ? { ...item, CantidadAsignada: 0 }
-            : item,
-        ),
+            ? {
+                ...item,
+                CantidadAsignada: 0,
+              }
+            : item
+        )
       );
+
       return;
     }
 
     const cantidadInput = Number(valorTexto);
 
-    // Limitamos únicamente la cantidad máxima según la disponibilidad real
     const nuevaCantidad = Math.min(cantidadInput, recurso.cantidadDisponible);
 
     onChange(
@@ -87,8 +78,8 @@ const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
               ...item,
               CantidadAsignada: nuevaCantidad,
             }
-          : item,
-      ),
+          : item
+      )
     );
   };
 
@@ -96,24 +87,13 @@ const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
     recursos.filter((recurso) => recurso.tipo === tipo);
 
   return (
-    <Box
-      sx={{
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: 2,
-        p: 2,
-        mt: 2,
-      }}
-    >
-      <Typography variant="h6" sx={{ mb: 0.5 }}>
+    <Box>
+      <Typography variant="h6" sx={{ mb: 2 }}>
         Recursos del evento
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Seleccioná los recursos que necesitás para el evento y la cantidad.
-        <br />
-        (Se requiere seleccionar la fecha del evento para ver la disponibilidad
-        de los recursos)
+        Seleccione los recursos que necesitará para la actividad.
       </Typography>
 
       <Stack spacing={2}>
@@ -135,25 +115,25 @@ const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
               <Stack spacing={1}>
                 {recursosDelTipo.map((recurso) => {
                   const seleccionado = estaSeleccionado(recurso.recursoId);
+
                   const cantidadActual = obtenerCantidad(recurso.recursoId);
 
                   return (
                     <Box
                       key={recurso.recursoId}
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                         gap: 2,
                         p: 1,
                         borderRadius: 1,
-                        "&:hover": {
-                          backgroundColor: "action.hover",
+                        '&:hover': {
+                          backgroundColor: 'action.hover',
                         },
                       }}
                     >
                       <FormControlLabel
-                        sx={{ m: 0, flex: 1 }}
                         control={
                           <Checkbox
                             checked={seleccionado}
@@ -172,7 +152,7 @@ const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
                               variant="caption"
                               color="text.secondary"
                             >
-                              Disponibles: {recurso.cantidadDisponible}
+                              Disponible: {recurso.cantidadDisponible}
                             </Typography>
                           </Box>
                         }
@@ -182,21 +162,18 @@ const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
                         label="Cantidad"
                         type="number"
                         size="small"
-                        // Si el valor es 0, mostramos vacío en pantalla para que el usuario pueda escribir de cero limpiamente
                         value={
                           seleccionado
                             ? cantidadActual === 0
-                              ? ""
+                              ? ''
                               : cantidadActual
-                            : ""
+                            : ''
                         }
                         disabled={!seleccionado}
                         onChange={(e) =>
                           handleCantidadChange(recurso, e.target.value)
                         }
-                        sx={{
-                          width: 110,
-                        }}
+                        sx={{ width: 110 }}
                       />
                     </Box>
                   );

@@ -1,15 +1,12 @@
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
 
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 
 import MenuButton from "./MenuButton";
 import MenuContent from "./MenuContent";
+import UserMenu from "./UserMenu";
 
 export default function SideMenuMobile({ open, toggleDrawer }) {
   const handleNavigate = (event) => {
@@ -35,23 +32,7 @@ export default function SideMenuMobile({ open, toggleDrawer }) {
             gap: 1,
           }}
         >
-          <Stack
-            direction="row"
-            sx={{
-              gap: 1,
-              alignItems: "center",
-              flexGrow: 1,
-            }}
-          >
-            <Avatar
-              sx={{
-                width: 24,
-                height: 24,
-              }}
-            />
-
-            <Typography variant="h6">Usuario</Typography>
-          </Stack>
+          <UserMenu compact onAction={() => toggleDrawer(false)()} />
 
           <MenuButton showBadge>
             <NotificationsRoundedIcon />
@@ -62,18 +43,6 @@ export default function SideMenuMobile({ open, toggleDrawer }) {
 
         <Stack sx={{ flexGrow: 1 }}>
           <MenuContent onNavigate={handleNavigate} />
-        </Stack>
-
-        <Divider />
-
-        <Stack sx={{ p: 2 }}>
-          <Button
-            variant="outlined"
-            fullWidth
-            startIcon={<LogoutRoundedIcon />}
-          >
-            Cerrar sesión
-          </Button>
         </Stack>
       </Stack>
     </Drawer>

@@ -3,12 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useAuth } from '../../auth/AuthContext';
 import { authService } from '../../lib/auth';
 import useNotifications from '../hooks/notification/useNotifications';
 import { API_URL } from '../../services/api';
 import ImageUpload from '../ImageUpload';
-import EventResourceSelector from '../EventResourceSelector';
+import EventResourceSelector from '../ResourceSelector';
 
 import {
   Box,
@@ -17,7 +16,6 @@ import {
   CircularProgress,
   FormControl,
   FormControlLabel,
-  FormGroup,
   FormHelperText,
   FormLabel,
   MenuItem,
@@ -33,10 +31,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import EventAvailabilityCalendar from './EventAvailabilityCalendar';
 
-// =========================
-// VALIDACIÓN
-// =========================
-
 const schema = z.object({
   NombreyApellidoSolicitante: z.string().min(3, 'Mínimo 3 caracteres'),
 
@@ -50,7 +44,7 @@ const schema = z.object({
   Institucion: z.string().min(1, 'Ingrese la institución'),
 
   TipoEvento: z.enum(
-    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'],
     'Seleccione un tipo de evento válido'
   ),
 
@@ -60,9 +54,7 @@ const schema = z.object({
 
   FundamentacionEvento: z.string().optional(),
 
-  TipoPublico: z
-    .array(z.string())
-    .min(1, 'Seleccione al menos un tipo de público'),
+  TipoPublico: z.string().min(1, 'Ingrese el tipo de público'),
 
   ConcurrenciaEstimada: z.coerce
     .number()
@@ -76,9 +68,11 @@ const schema = z.object({
   SalasIds: z.array(z.string()).min(1, 'Seleccione al menos una sala'),
 
   RequiereDifusion: z.boolean(),
+
   SolicitarAsistenciaDifusion: z.boolean(),
 
   RRule: z.string().nullable().default(null),
+
   Recursos: z
     .array(
       z.object({
@@ -88,10 +82,6 @@ const schema = z.object({
     )
     .default([]),
 });
-
-// =========================
-// OPCIONES
-// =========================
 
 const tiposEvento = [
   { value: '0', label: 'Conferencia' },
@@ -107,29 +97,14 @@ const tiposEvento = [
   { value: '10', label: 'Conversatorio' },
   { value: '11', label: 'Cine debate' },
   { value: '12', label: 'Otros' },
+  { value: '13', label: 'MuestraExposicionTemporal' },
 ];
-
-const tiposPublico = [
-  { value: '0', label: 'General' },
-  { value: '1', label: 'Infantil y familiar' },
-  { value: '2', label: 'Estudiantes' },
-  { value: '3', label: 'Investigadores' },
-  { value: '4', label: 'Docentes' },
-  { value: '5', label: 'Adultos mayores' },
-  { value: '6', label: 'Organizaciones sociales' },
-  { value: '7', label: 'Público cerrado' },
-  { value: '8', label: 'Otros' },
-];
-
-// =========================
-// COMPONENTE
-// =========================
 
 export default function FormularioEventos() {
   const navigate = useNavigate();
   const notifications = useNotifications();
-  const auth = useAuth();
   const calendarRef = useRef(null);
+
   const [salas, setSalas] = React.useState([]);
   const [imagenes, setImagenes] = React.useState([]);
   const [loadingSalas, setLoadingSalas] = React.useState(true);
@@ -145,31 +120,22 @@ export default function FormularioEventos() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
-
     mode: 'onSubmit',
-
     reValidateMode: 'onChange',
-
     defaultValues: {
       NombreyApellidoSolicitante: '',
       TelefonoSolicitante: '',
       EmailSolicitante: '',
       Institucion: '',
-
       TipoEvento: '',
       TituloEvento: '',
       DescripcionEvento: '',
       FundamentacionEvento: '',
-
-      TipoPublico: [],
-
+      TipoPublico: '',
       ConcurrenciaEstimada: '',
-
       Inicio: '',
       Fin: '',
-
       SalasIds: [],
-
       RequiereDifusion: false,
       RRule: null,
       SolicitarAsistenciaDifusion: false,
@@ -178,21 +144,19 @@ export default function FormularioEventos() {
   });
 
   const salasIds = watch('SalasIds');
+  const inicio = watch('Inicio');
+  const fin = watch('Fin');
+  const rrule = watch('RRule');
 
-  // =========================
-  // OBTENER SALAS
-  // =========================
-
+  // Obtener salas disponibles
   useEffect(() => {
     const obtenerSalas = async () => {
       setLoadingSalas(true);
 
       try {
         const response = await authService.authenticatedFetch(
-          `${API_URL}/api/v1/eventos/salas-disponibles`,
-          {
-            method: 'GET',
-          }
+          `${API_URL}/api/v1/eventos/salas-disponibles-eventos`,
+          { method: 'GET' }
         );
 
         if (!response.ok) {
@@ -200,13 +164,10 @@ export default function FormularioEventos() {
         }
 
         const result = await response.json();
-
         setSalas(result?.data?.items ?? []);
       } catch (error) {
         console.error('Error obteniendo salas:', error);
-
         notifications.error('No se pudieron obtener las salas.');
-
         setSalas([]);
       } finally {
         setLoadingSalas(false);
@@ -216,52 +177,40 @@ export default function FormularioEventos() {
     obtenerSalas();
   }, []);
 
-  // =========================
-  // CAMBIAR SALAS
-  // =========================
-
+  // Cambiar salas y limpiar la disponibilidad seleccionada
   const handleSalaChange = (field, salaId) => {
     const value = field.value ?? [];
 
-    let nuevasSalas;
-
-    if (value.includes(salaId)) {
-      nuevasSalas = value.filter((id) => id !== salaId);
-    } else {
-      nuevasSalas = [...value, salaId];
-    }
+    const nuevasSalas = value.includes(salaId)
+      ? value.filter((id) => id !== salaId)
+      : [...value, salaId];
 
     field.onChange(nuevasSalas);
 
-    // Al cambiar las salas,
-    // la disponibilidad anterior deja de ser válida.
     setValue('Inicio', '');
     setValue('Fin', '');
     setValue('RRule', null);
     setValue('Recursos', []);
   };
 
-  // =========================
-  // SELECCIONAR HORARIO
-  // =========================
-  // este es el nuevo que capas usemos para que le llegen los datos finales
+  // Seleccionar horario
   const handleEventConfigurationChange = (configuracion) => {
-    const inicio =
+    const nuevoInicio =
       configuracion.fechaInicio && configuracion.horaInicio
         ? `${configuracion.fechaInicio}T${configuracion.horaInicio}`
         : '';
 
-    const fin =
+    const nuevoFin =
       configuracion.fechaFin && configuracion.horaFin
         ? `${configuracion.fechaFin}T${configuracion.horaFin}`
         : '';
 
-    setValue('Inicio', inicio, {
+    setValue('Inicio', nuevoInicio, {
       shouldValidate: true,
       shouldDirty: true,
     });
 
-    setValue('Fin', fin, {
+    setValue('Fin', nuevoFin, {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -271,19 +220,14 @@ export default function FormularioEventos() {
       shouldDirty: true,
     });
 
-    // La disponibilidad de recursos depende
-    // de la nueva configuración temporal.
     setValue('Recursos', [], {
       shouldDirty: true,
       shouldValidate: true,
     });
   };
-  const inicio = watch('Inicio');
-  const fin = watch('Fin');
-  const rrule = watch('RRule');
 
+  // Obtener disponibilidad de recursos
   useEffect(() => {
-    // ◄--- ESTA LÍNEA CORREGIDA (abre el paréntesis y la función)
     const obtenerDisponibilidadRecursos = async () => {
       if (!inicio || !fin) {
         setRecursosDisponibles([]);
@@ -291,10 +235,7 @@ export default function FormularioEventos() {
       }
 
       try {
-        const params = new URLSearchParams({
-          inicio,
-          fin,
-        });
+        const params = new URLSearchParams({ inicio, fin });
 
         if (rrule) {
           params.append('rrule', rrule);
@@ -302,9 +243,7 @@ export default function FormularioEventos() {
 
         const response = await authService.authenticatedFetch(
           `${API_URL}/api/v1/Recurso/disponibilidad?${params.toString()}`,
-          {
-            method: 'GET',
-          }
+          { method: 'GET' }
         );
 
         if (!response.ok) {
@@ -312,14 +251,10 @@ export default function FormularioEventos() {
         }
 
         const result = await response.json();
-
-        // CAMBIA ESTA LÍNEA:
-        setRecursosDisponibles(result?.data ?? []); // <--- Extrae directamente el array que está en "data"
+        setRecursosDisponibles(result?.data ?? []);
       } catch (error) {
         console.error('Error obteniendo disponibilidad de recursos:', error);
-
         setRecursosDisponibles([]);
-
         notifications.error(
           'No se pudo obtener la disponibilidad de recursos.'
         );
@@ -327,12 +262,9 @@ export default function FormularioEventos() {
     };
 
     obtenerDisponibilidadRecursos();
-  }, [inicio, fin, rrule]); // ◄--- Ahora esto sí coincide y cierra bien
+  }, [inicio, fin, rrule]);
 
-  // =========================
-  // SUBMIT
-  // =========================
-
+  // Crear evento
   const onSubmit = async (data) => {
     const formData = new FormData();
 
@@ -340,29 +272,19 @@ export default function FormularioEventos() {
       'NombreyApellidoSolicitante',
       data.NombreyApellidoSolicitante
     );
-
     formData.append('TelefonoSolicitante', data.TelefonoSolicitante);
-
     formData.append('EmailSolicitante', data.EmailSolicitante);
-
     formData.append('Institucion', data.Institucion);
-
     formData.append('TipoEvento', data.TipoEvento);
-
     formData.append('TituloEvento', data.TituloEvento);
-
     formData.append('DescripcionEvento', data.DescripcionEvento || '');
-
     formData.append('FundamentacionEvento', data.FundamentacionEvento || '');
 
-    data.TipoPublico.forEach((tipo) => {
-      formData.append('TipoPublico', tipo);
-    });
+    // TipoPublico ahora es un string, no una colección.
+    formData.append('TipoPublico', data.TipoPublico);
 
     formData.append('ConcurrenciaEstimada', String(data.ConcurrenciaEstimada));
-
     formData.append('Inicio', data.Inicio);
-
     formData.append('Fin', data.Fin);
 
     data.SalasIds.forEach((salaId) => {
@@ -370,19 +292,21 @@ export default function FormularioEventos() {
     });
 
     formData.append('RequiereDifusion', String(data.RequiereDifusion));
+    formData.append(
+      'SolicitarAsistenciaDifusion',
+      String(data.SolicitarAsistenciaDifusion)
+    );
+
     if (data.RRule) {
       formData.append('RRule', data.RRule);
     }
+
     imagenes.forEach((imagen) => {
       formData.append('imagenes', imagen);
     });
-    formData.append(
-      'SolicitarAsistenciaDifusion',
-      String(data.SolicitarAsistenciaDifusion ?? false)
-    );
+
     data.Recursos.forEach((recurso, index) => {
       formData.append(`Recursos[${index}].RecursoId`, recurso.RecursoId);
-
       formData.append(
         `Recursos[${index}].CantidadAsignada`,
         String(recurso.CantidadAsignada)
@@ -390,66 +314,67 @@ export default function FormularioEventos() {
     });
 
     try {
-      // CAMBIAMOS ESTA LÍNEA por un fetch nativo estándar
-      const response = await fetch(`${API_URL}/api/v1/eventos`, {
-        method: 'POST',
-        body: formData, // Mandamos el formData directo
-        // NOTA: Dejamos las headers completamente vacías o no las ponemos.
-        // El navegador inyectará el 'multipart/form-data' correcto por sí solo.
-      });
+      const response = await authService.authenticatedFetch(
+        `${API_URL}/api/v1/Eventos`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Error al crear el evento');
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Error al crear el evento');
       }
 
       const createdEvent = await response.json();
 
       reset();
-
+      setImagenes([]);
       notifications.success('Evento creado correctamente');
 
       navigate(`/eventos/${createdEvent.id}`);
     } catch (error) {
       console.error('Error al crear evento:', error);
-
-      notifications.error('No se pudo crear el evento.');
+      notifications.error(error.message || 'No se pudo crear el evento.');
     }
   };
 
-  // =========================
-  // ERROR DE VALIDACIÓN
-  // =========================
-
-  const onError = (errors) => {
-    console.log('SUBMIT ERROR', errors);
+  const onError = (formErrors) => {
+    console.log('SUBMIT ERROR', formErrors);
   };
-
-  // =========================
-  // RENDER
-  // =========================
 
   return (
     <Box
       sx={{
-        width: '100%',
-        maxWidth: 1000,
-        mx: 'auto',
-        px: 2,
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        p: 2,
+        bgcolor: 'background.default',
       }}
     >
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit, onError)}
         sx={{
-          maxWidth: 700,
-          mx: 'auto',
+          width: '100%',
+          maxWidth: 800,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          p: { xs: 2, sm: 4 },
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 3,
         }}
       >
-        {/* =========================
-            DATOS DEL SOLICITANTE
-        ========================= */}
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          Formulario de Eventos y Actividades Externas
+        </Typography>
 
-        <Typography variant="h5" sx={{ mb: 2 }}>
+        <Typography variant="h5" sx={{ mb: 1 }}>
           Datos del solicitante
         </Typography>
 
@@ -490,17 +415,7 @@ export default function FormularioEventos() {
           helperText={errors.Institucion?.message}
         />
 
-        {/* =========================
-            DATOS DEL EVENTO
-        ========================= */}
-
-        <Typography
-          variant="h5"
-          sx={{
-            mt: 4,
-            mb: 2,
-          }}
-        >
+        <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
           Datos del evento
         </Typography>
 
@@ -559,50 +474,16 @@ export default function FormularioEventos() {
           helperText={errors.FundamentacionEvento?.message}
         />
 
-        {/* =========================
-            TIPO DE PÚBLICO
-        ========================= */}
-
-        <Controller
-          name="TipoPublico"
-          control={control}
-          render={({ field }) => (
-            <FormControl fullWidth margin="normal" error={!!errors.TipoPublico}>
-              <FormLabel sx={{ mb: 1 }}>Tipo de público</FormLabel>
-
-              <FormGroup>
-                {tiposPublico.map((tipo) => (
-                  <FormControlLabel
-                    key={tipo.value}
-                    control={
-                      <Checkbox
-                        checked={field.value?.includes(tipo.value) ?? false}
-                        onChange={() => {
-                          const value = field.value ?? [];
-
-                          if (value.includes(tipo.value)) {
-                            field.onChange(
-                              value.filter((x) => x !== tipo.value)
-                            );
-                          } else {
-                            field.onChange([...value, tipo.value]);
-                          }
-                        }}
-                      />
-                    }
-                    label={tipo.label}
-                  />
-                ))}
-              </FormGroup>
-
-              <FormHelperText>{errors.TipoPublico?.message}</FormHelperText>
-            </FormControl>
-          )}
+        {/* Tipo de público: ahora es un único texto */}
+        <TextField
+          label="Tipo de público"
+          placeholder="Ej.: estudiantes universitarios, público general..."
+          fullWidth
+          margin="normal"
+          {...register('TipoPublico')}
+          error={!!errors.TipoPublico}
+          helperText={errors.TipoPublico?.message}
         />
-
-        {/* =========================
-            CONCURRENCIA
-        ========================= */}
 
         <TextField
           label="Concurrencia estimada"
@@ -620,27 +501,16 @@ export default function FormularioEventos() {
           }}
         />
 
-        {/* =========================
-            SALAS
-        ========================= */}
-
         <Controller
           name="SalasIds"
           control={control}
           render={({ field }) => (
             <FormControl fullWidth margin="normal" error={!!errors.SalasIds}>
-              <FormLabel sx={{ mb: 1 }}>Salas</FormLabel>
+              <FormLabel sx={{ mb: 1 }}>Salas disponibles</FormLabel>
 
               {loadingSalas ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                  }}
-                >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CircularProgress size={20} />
-
                   <Typography variant="body2">Cargando salas...</Typography>
                 </Box>
               ) : salas.length === 0 ? (
@@ -648,7 +518,7 @@ export default function FormularioEventos() {
                   No hay salas disponibles.
                 </Typography>
               ) : (
-                <FormGroup>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   {salas.map((sala) => (
                     <FormControlLabel
                       key={sala.id}
@@ -661,7 +531,7 @@ export default function FormularioEventos() {
                       label={`${sala.nombre} — Capacidad: ${sala.capacidad}`}
                     />
                   ))}
-                </FormGroup>
+                </Box>
               )}
 
               <FormHelperText>{errors.SalasIds?.message}</FormHelperText>
@@ -669,19 +539,10 @@ export default function FormularioEventos() {
           )}
         />
 
-        {/* =========================
-            DISPONIBILIDAD
-        ========================= */}
-
-        <Typography
-          variant="h6"
-          sx={{
-            mt: 4,
-            mb: 1,
-          }}
-        >
+        <Typography variant="h6" sx={{ mt: 4, mb: 1 }}>
           Seleccione un horario disponible
         </Typography>
+
         <EventAvailabilityCalendar
           ref={calendarRef}
           salasIds={salasIds}
@@ -694,9 +555,11 @@ export default function FormularioEventos() {
           </FormHelperText>
         )}
 
-        {/* =========================
-            INICIO
-        ========================= */}
+        {errors.Fin && (
+          <FormHelperText error sx={{ mt: 1 }}>
+            {errors.Fin.message}
+          </FormHelperText>
+        )}
 
         <Box
           sx={{
@@ -713,21 +576,16 @@ export default function FormularioEventos() {
 
           <Typography variant="body1">
             <strong>Inicio:</strong>{' '}
-            {watch('Inicio')
-              ? dayjs(watch('Inicio')).format('DD/MM/YYYY HH:mm')
+            {inicio
+              ? dayjs(inicio).format('DD/MM/YYYY HH:mm')
               : 'Sin seleccionar'}
           </Typography>
 
           <Typography variant="body1" sx={{ mt: 1 }}>
             <strong>Fin:</strong>{' '}
-            {watch('Fin')
-              ? dayjs(watch('Fin')).format('DD/MM/YYYY HH:mm')
-              : 'Sin seleccionar'}
+            {fin ? dayjs(fin).format('DD/MM/YYYY HH:mm') : 'Sin seleccionar'}
           </Typography>
         </Box>
-        {/* =========================
-            DIFUSIÓN
-        ========================= */}
 
         <Controller
           name="RequiereDifusion"
@@ -744,7 +602,6 @@ export default function FormularioEventos() {
                 }}
               >
                 <FormControlLabel value="true" control={<Radio />} label="Sí" />
-
                 <FormControlLabel
                   value="false"
                   control={<Radio />}
@@ -754,20 +611,24 @@ export default function FormularioEventos() {
             </FormControl>
           )}
         />
+
         <ImageUpload imagenes={imagenes} onChange={setImagenes} />
+
         <FormControlLabel
           control={
             <Checkbox
               checked={watch('SolicitarAsistenciaDifusion')}
-              onChange={(e) =>
-                setValue('SolicitarAsistenciaDifusion', e.target.checked, {
+              onChange={(event) =>
+                setValue('SolicitarAsistenciaDifusion', event.target.checked, {
                   shouldDirty: true,
+                  shouldValidate: true,
                 })
               }
             />
           }
           label="Solicitar asistencia para la creación del flyer o imagen promocional."
         />
+
         <Controller
           name="Recursos"
           control={control}
@@ -779,10 +640,6 @@ export default function FormularioEventos() {
             />
           )}
         />
-
-        {/* =========================
-            SUBMIT
-        ========================= */}
 
         <Button
           type="submit"
