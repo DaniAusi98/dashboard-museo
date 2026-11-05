@@ -25,6 +25,7 @@ const ActividadEducativaDateConfigurationResponsive = ({
       onActivityConfigurationChange={onActivityConfigurationChange}
       slotsNoDisponibles={slotsNoDisponibles}
       salasIds={salasIds}
+      onClose={onClose}
     />
   );
 

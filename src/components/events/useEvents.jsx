@@ -20,6 +20,7 @@ export function useEvents() {
       setLoading(false);
     }
   }, []);
+
   const fetchEventsByRoom = useCallback(async (desde, hasta) => {
     try {
       setLoading(true);

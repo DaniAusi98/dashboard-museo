@@ -21,7 +21,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
-import useNotifications from '../hooks/notification/useNotifications';
+import useNotifications from '../../hooks/notification/useNotifications';
 
 const diasSemana = [
   { value: 'MO', label: 'Lun' },
@@ -38,6 +38,7 @@ const ActividadEducativaDateConfiguration = ({
   onActivityConfigurationChange,
   slotsNoDisponibles = [],
   salasIds = [],
+  onClose,
 }) => {
   const notifications = useNotifications();
 
@@ -580,6 +581,7 @@ const ActividadEducativaDateConfiguration = ({
     console.log('Configuración enviada al padre:', configuracion);
 
     onActivityConfigurationChange(configuracion);
+    onClose?.();
   };
 
   // =========================================================

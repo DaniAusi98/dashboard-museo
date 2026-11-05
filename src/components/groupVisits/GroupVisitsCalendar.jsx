@@ -29,7 +29,7 @@ export default function GroupVisitsCalendar({ onDateRangeChange }) {
         onDateRangeChange(fetchInfo.startStr, fetchInfo.endStr);
         const events = response.items.map((visit) => ({
           id: String(visit.id),
-          title: `${visit.tipo} - ${visit.institucion}`,
+          title: `${visit.titulo}`,
           start: visit.horaInicio,
           end: visit.horaFin,
           visit,

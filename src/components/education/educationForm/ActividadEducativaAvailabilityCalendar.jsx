@@ -19,12 +19,12 @@ import CardContent from '@mui/material/CardContent';
 import CircularProgress from '@mui/material/CircularProgress';
 import Tooltip from '@mui/material/Tooltip';
 
-import { API_URL } from '../../services/api';
-import { authService } from '../../lib/auth';
+import { API_URL } from '../../../services/api';
+import { authService } from '../../../lib/auth';
 
 import ActividadEducativaDateConfigurationResponsive from './ActividadEducativaDateConfigurationResponsive';
 
-import CalendarToolbar from '../mainCalendar/CalendarToolbar';
+import CalendarToolbar from '../../mainCalendar/CalendarToolbar';
 
 const ActividadEducativaAvailabilityCalendar = forwardRef(
   ({ salasIds = [], onActivityConfigurationChange }, ref) => {

@@ -1,11 +1,11 @@
-import FormularioPropuestaEvento from '../components/events/eventProposals/CreateEventProposal';
-import FormularioPropuestaMuestra from '../components/events/FormularioPropuestaMuestra';
+import PropuestasEventos from '../components/events/eventProposals/PropuestasEventos';
+import PropuestasMuestras from '../components/events/eventProposals/PropuestasMuestras ';
 
 export default function EventProposalPage() {
   return (
     <>
-      <FormularioPropuestaEvento />
-      <FormularioPropuestaMuestra />
+      <PropuestasEventos />
+      <PropuestasMuestras />
     </>
   );
 }

@@ -88,12 +88,8 @@ const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
 
   return (
     <Box>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Recursos del evento
-      </Typography>
-
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Seleccione los recursos que necesitará para la actividad.
+        Seleccione los recursos e indique la cantidad solicitada.
       </Typography>
 
       <Stack spacing={2}>
@@ -187,4 +183,4 @@ const EventResourceSelector = ({ recursos = [], value = [], onChange }) => {
   );
 };
 
-export default EventResourceSelector;
+export default React.memo(EventResourceSelector);

@@ -19,10 +19,14 @@ import MuseumHoursPage from '../pages/MuseumHoursPage';
 import ClosyngFormPage from '../pages/ClosyngDayFormPage';
 import GroupVisitConfigurationPage from '../pages/GroupVisitConfigurationPage';
 import EventProposalPage from '../pages/EventProposalPage';
-import PropuestaMuestraPage from '../pages/PropuestaMuestraPage';
+import ExhibitionProposalFormPage from '../pages/ExhibitionProposalFormPage';
+import EventProposalFormPage from '../pages/EventProposalFormPage';
 
 import CompletarFormularioEventoPage from '../pages/CompletarFormularioEventoPage';
 import CompletarMuestraPage from '../pages/CompletarMuestraPage';
+import ActividadEducativaFormPage from '../pages/ActividadEducativaFormPage';
+
+import { GuidedTourFormPage } from '../pages/GuidedTourFormPage';
 
 export const RoutesApp = () => {
   return (
@@ -35,10 +39,22 @@ export const RoutesApp = () => {
           <Route path="/groupVisits" element={<GroupVisitsPage />} />
           <Route path="/eventsActivities" element={<EventsActivitiesPage />} />
           <Route path="/eventProposal" element={<EventProposalPage />} />
-          <Route path="/propuestamuestra" element={<PropuestaMuestraPage />} />
+          <Route
+            path="/eventProposalForm"
+            element={<EventProposalFormPage />}
+          />
+          <Route path="/guidedTourForm" element={<GuidedTourFormPage />} />
+          <Route
+            path="/exhibition-proposal-form"
+            element={<ExhibitionProposalFormPage />}
+          />
 
           {/* Educación */}
           <Route path="/education" element={<EducationPage />} />
+          <Route
+            path="/education/activityForm"
+            element={<ActividadEducativaFormPage />}
+          />
           <Route
             path="/guideAvailability"
             element={<GuideAvailabilityPage />}

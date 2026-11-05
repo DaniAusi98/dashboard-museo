@@ -1,6 +1,6 @@
 import FormularioPropuestaMuestra from '../components/events/FormularioPropuestaMuestra';
 
-export default function PropuestaMuestraPage() {
+export default function ExhibitionProposalFormPage() {
   return (
     <>
       <FormularioPropuestaMuestra />

@@ -16,8 +16,8 @@ import { useEvents } from './useEvents';
 
 export default function EventsGridWrapper() {
   const navigate = useNavigate();
-  const [fechaDesde, setFechaDesde] = useState(dayjs().startOf('month'));
 
+  const [fechaDesde, setFechaDesde] = useState(dayjs().startOf('month'));
   const [fechaHasta, setFechaHasta] = useState(dayjs().endOf('month'));
 
   const { events, eventsByRoom, loading, fetchEvents, fetchEventsByRoom } =
@@ -25,7 +25,8 @@ export default function EventsGridWrapper() {
 
   useEffect(() => {
     const desde = fechaDesde.format('YYYY-MM-DD');
-    const hasta = fechaHasta.format('YYYY-MM-DD');
+
+    const hasta = fechaHasta ? fechaHasta.format('YYYY-MM-DD') : null;
 
     fetchEvents(desde, hasta);
     fetchEventsByRoom(desde, hasta);
@@ -54,6 +55,7 @@ export default function EventsGridWrapper() {
           }}
         >
           <Typography variant="h5">Eventos y Actividades Externas</Typography>
+
           <Box
             sx={{
               display: 'flex',
@@ -68,11 +70,19 @@ export default function EventsGridWrapper() {
             <Button variant="contained" onClick={() => navigate('/eventForm')}>
               Formulario
             </Button>
+
             <Button variant="outlined">Enviar formulario</Button>
           </Box>
         </Box>
 
-        <Box sx={{ width: '100%', bgcolor: '#fff', p: 2, borderRadius: 1 }}>
+        <Box
+          sx={{
+            width: '100%',
+            bgcolor: '#fff',
+            p: 2,
+            borderRadius: 1,
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
@@ -81,7 +91,6 @@ export default function EventsGridWrapper() {
                 sm: 'row',
               },
               alignItems: 'center',
-              justifyContent: 'flex-end',
               justifyContent: {
                 xs: 'center',
                 sm: 'space-between',
@@ -91,16 +100,19 @@ export default function EventsGridWrapper() {
             }}
           >
             <Typography variant="h6">Periodo:</Typography>
+
             <ReportPeriodFilter
               fechaDesdeInicial={fechaDesde}
               fechaHastaInicial={fechaHasta}
               onAplicar={aplicarPeriodo}
             />
           </Box>
+
           <Box sx={{ mt: 4 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
               Eventos
             </Typography>
+
             <EventsGrid rows={events} loading={loading} />
           </Box>
 

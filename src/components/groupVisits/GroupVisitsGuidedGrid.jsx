@@ -1,5 +1,6 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import AddIcon from '@mui/icons-material/Add';
 import {
   getVisitStatusRowClassName,
   visitStatusGridSx,
@@ -84,9 +85,28 @@ export default function GroupVisitsGuidedGrid({
 
   return (
     <Box sx={{ width: '100%', mt: 3 }}>
-      <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
-        {title}
-      </Typography>
+      {/* ENCABEZADO */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2,
+          mt: 4,
+          mb: 2,
+        }}
+      >
+        <Typography variant="h6">{title}</Typography>
+
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/guidedTourForm')}
+        >
+          Nueva visita
+        </Button>
+      </Box>
 
       <DataGrid
         rows={rows}

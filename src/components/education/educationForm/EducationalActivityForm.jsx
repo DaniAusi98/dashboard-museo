@@ -3,14 +3,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+
 import ActividadEducativaAvailabilityCalendar from './ActividadEducativaAvailabilityCalendar';
-import { API_URL } from '../../services/api';
-import { authService } from '../../lib/auth';
-import useNotifications from '../hooks/notification/useNotifications';
+import { API_URL } from '../../../services/api';
+import { authService } from '../../../lib/auth';
+import useNotifications from '../../hooks/notification/useNotifications';
 
-import ImageUpload from '../ImageUpload';
+import ImageUpload from '../../ImageUpload';
+import EventResourceSelector from '../../ResourceSelector';
 
-import EventResourceSelector from '../EventResourceSelector';
+import AddIcon from '@mui/icons-material/Add';
 
 import {
   Box,
@@ -40,12 +42,16 @@ const schema = z.object({
     ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
     'Seleccione un tipo de evento válido'
   ),
+
   ProyectoVinculadaId: z.string().min(1, 'Seleccione un proyecto vinculado '),
   InstitucionVinculada: z.string().min(1, 'Ingrese la institución vinculada'),
+
   PublicoObjetivo: z
     .string()
     .min(1, 'Indique el publico al que se dirige la actividad'),
+
   Observaciones: z.string().optional(),
+
   Inicio: z.string().min(1, 'Seleccione un horario'),
   Fin: z.string().min(1, 'Seleccione un horario'),
 
@@ -61,7 +67,9 @@ const schema = z.object({
 
   RequiereDifusion: z.boolean(),
   SolicitarAsistenciaDifusion: z.boolean(),
+
   RRule: z.string().nullable().default(null),
+
   Recursos: z
     .array(
       z.object({
@@ -71,6 +79,7 @@ const schema = z.object({
     )
     .default([]),
 });
+
 const tipoActividadEducativa = [
   { value: '0', label: 'Conferencia' },
   { value: '1', label: 'Taller' },
@@ -89,12 +98,17 @@ const tipoActividadEducativa = [
 
 export default function FormularioActividadEducativa() {
   const navigate = useNavigate();
+
   const [salas, setSalas] = React.useState([]);
   const [imagenes, setImagenes] = React.useState([]);
   const [loadingSalas, setLoadingSalas] = React.useState(true);
+
   const [recursosDisponibles, setRecursosDisponibles] = useState([]);
+  const [mostrarSelectorRecursos, setMostrarSelectorRecursos] = useState(false);
+
   const [proyectosEducativos, setProyectosEducativos] = useState([]);
   const [loadingProyectos, setLoadingProyectos] = useState(true);
+
   const calendarRef = useRef(null);
   const notifications = useNotifications();
 
@@ -103,6 +117,7 @@ export default function FormularioActividadEducativa() {
     control,
     handleSubmit,
     reset,
+    getValues,
     watch,
     setValue,
     formState: { errors, isSubmitting },
@@ -127,6 +142,7 @@ export default function FormularioActividadEducativa() {
       Recursos: [],
     },
   });
+
   const salasIds = watch('SalasIds');
 
   useEffect(() => {
@@ -136,9 +152,7 @@ export default function FormularioActividadEducativa() {
 
         const response = await authService.authenticatedFetch(
           `${API_URL}/api/v1/ActividadEducativa/salas-disponibles-actEducativas`,
-          {
-            method: 'GET',
-          }
+          { method: 'GET' }
         );
 
         if (!response.ok) {
@@ -146,10 +160,9 @@ export default function FormularioActividadEducativa() {
         }
 
         const result = await response.json();
-
         setSalas(result?.data?.items ?? []);
       } catch (error) {
-        console.error('Error obteniendo salas:', error);
+        console.error('Error obteniendo las salas:', error);
         setSalas([]);
       } finally {
         setLoadingSalas(false);
@@ -158,6 +171,7 @@ export default function FormularioActividadEducativa() {
 
     obtenerSalas();
   }, []);
+
   useEffect(() => {
     const obtenerProyectosEducativos = async () => {
       setLoadingProyectos(true);
@@ -165,9 +179,7 @@ export default function FormularioActividadEducativa() {
       try {
         const response = await authService.authenticatedFetch(
           `${API_URL}/api/v1/ActividadEducativa/proyectos-educativos`,
-          {
-            method: 'GET',
-          }
+          { method: 'GET' }
         );
 
         if (!response.ok) {
@@ -175,13 +187,10 @@ export default function FormularioActividadEducativa() {
         }
 
         const result = await response.json();
-
         setProyectosEducativos(result?.data ?? []);
       } catch (error) {
         console.error('Error obteniendo proyectos educativos:', error);
-
         setProyectosEducativos([]);
-
         notifications.error('No se pudieron obtener los proyectos educativos.');
       } finally {
         setLoadingProyectos(false);
@@ -190,6 +199,7 @@ export default function FormularioActividadEducativa() {
 
     obtenerProyectosEducativos();
   }, []);
+
   const handleSalaChange = (field, salaId) => {
     const value = field.value ?? [];
 
@@ -203,17 +213,17 @@ export default function FormularioActividadEducativa() {
 
     field.onChange(nuevasSalas);
 
-    // Al cambiar las salas,
-    // la disponibilidad anterior deja de ser válida.
+    // Al cambiar las salas, la disponibilidad anterior deja de ser válida.
     setValue('Inicio', '');
     setValue('Fin', '');
     setValue('RRule', null);
     setValue('Recursos', []);
   };
+
   // =========================
   // SELECCIONAR HORARIO
   // =========================
-  // este es el nuevo que capas usemos para que le llegen los datos finales
+
   const handleActEducationConfigurationChange = (configuracion) => {
     const inicio =
       configuracion.fechaInicio && configuracion.horaInicio
@@ -225,33 +235,57 @@ export default function FormularioActividadEducativa() {
         ? `${configuracion.fechaFin}T${configuracion.horaFin}`
         : '';
 
-    setValue('Inicio', inicio, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-
-    setValue('Fin', fin, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-
-    setValue('RRule', configuracion.recurrencia || null, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-
-    // La disponibilidad de recursos depende
-    // de la nueva configuración temporal.
-    setValue('Recursos', [], {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
+    reset(
+      {
+        ...getValues(),
+        Inicio: inicio,
+        Fin: fin,
+        RRule: configuracion.recurrencia || null,
+        Recursos: [],
+      },
+      {
+        keepErrors: true,
+        keepDirty: true,
+        keepTouched: true,
+      }
+    );
   };
+
   const inicio = watch('Inicio');
   const fin = watch('Fin');
   const rrule = watch('RRule');
+
+  // =========================
+  // SOLICITAR RECURSOS
+  // =========================
+
+  const handleSolicitarRecursos = () => {
+    if (mostrarSelectorRecursos) {
+      setMostrarSelectorRecursos(false);
+      return;
+    }
+
+    if (!inicio || !fin) {
+      notifications.warning(
+        'Se requiere seleccionar una fecha para solicitar recursos.'
+      );
+
+      return;
+    }
+
+    setMostrarSelectorRecursos(true);
+  };
+
+  // =========================
+  // CONSULTAR DISPONIBILIDAD
+  // =========================
+
   useEffect(() => {
-    // ◄--- ESTA LÍNEA CORREGIDA (abre el paréntesis y la función)
+    // No consultamos recursos hasta que el usuario los solicite.
+    if (!mostrarSelectorRecursos) {
+      return;
+    }
+
     const obtenerDisponibilidadRecursos = async () => {
       if (!inicio || !fin) {
         setRecursosDisponibles([]);
@@ -270,9 +304,7 @@ export default function FormularioActividadEducativa() {
 
         const response = await authService.authenticatedFetch(
           `${API_URL}/api/v1/Recurso/disponibilidad?${params.toString()}`,
-          {
-            method: 'GET',
-          }
+          { method: 'GET' }
         );
 
         if (!response.ok) {
@@ -281,8 +313,7 @@ export default function FormularioActividadEducativa() {
 
         const result = await response.json();
 
-        // CAMBIA ESTA LÍNEA:
-        setRecursosDisponibles(result?.data ?? []); // <--- Extrae directamente el array que está en "data"
+        setRecursosDisponibles(result?.data ?? []);
       } catch (error) {
         console.error('Error obteniendo disponibilidad de recursos:', error);
 
@@ -295,28 +326,27 @@ export default function FormularioActividadEducativa() {
     };
 
     obtenerDisponibilidadRecursos();
-  }, [inicio, fin, rrule]);
+  }, [inicio, fin, rrule, mostrarSelectorRecursos]);
+
+  // =========================
+  // SUBMIT
+  // =========================
 
   const onSubmit = async (data) => {
     const formData = new FormData();
 
     formData.append('Titulo', data.Titulo);
-
     formData.append('TipoActividadEducativa', data.TipoActividadEducativa);
-
     formData.append('ProyectoVinculadaId', data.ProyectoVinculadaId);
-
     formData.append('InstitucionVinculada', data.InstitucionVinculada);
-
     formData.append('PublicoObjetivo', data.PublicoObjetivo);
-
     formData.append('Observaciones', data.Observaciones || '');
 
     if (data.CantidadAsistentes !== '') {
       formData.append('CantidadAsistentes', String(data.CantidadAsistentes));
     }
-    formData.append('Inicio', data.Inicio);
 
+    formData.append('Inicio', data.Inicio);
     formData.append('Fin', data.Fin);
 
     data.SalasIds.forEach((salaId) => {
@@ -324,16 +354,20 @@ export default function FormularioActividadEducativa() {
     });
 
     formData.append('RequiereDifusion', String(data.RequiereDifusion));
+
     if (data.RRule) {
       formData.append('RRule', data.RRule);
     }
+
     imagenes.forEach((imagen) => {
       formData.append('imagenes', imagen);
     });
+
     formData.append(
       'SolicitarAsistenciaDifusion',
       String(data.SolicitarAsistenciaDifusion ?? false)
     );
+
     data.Recursos.forEach((recurso, index) => {
       formData.append(`Recursos[${index}].RecursoId`, recurso.RecursoId);
 
@@ -344,16 +378,13 @@ export default function FormularioActividadEducativa() {
     });
 
     try {
-      // CAMBIAMOS ESTA LÍNEA por un fetch nativo estándar
       const response = await fetch(`${API_URL}/api/v1/ActividadEducativa`, {
         method: 'POST',
-        body: formData, // Mandamos el formData directo
-        // NOTA: Dejamos las headers completamente vacías o no las ponemos.
-        // El navegador inyectará el 'multipart/form-data' correcto por sí solo.
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Error al crear el evento');
+        throw new Error('Error al crear la actividad');
       }
 
       const createdEvent = await response.json();
@@ -365,10 +396,10 @@ export default function FormularioActividadEducativa() {
       navigate(`/actividades-educativas/${createdEvent.Id}`);
     } catch (error) {
       console.error('Error al crear la actividad:', error);
-
       notifications.error('No se pudo crear la actividad.');
     }
   };
+
   // =========================
   // ERROR DE VALIDACIÓN
   // =========================
@@ -376,6 +407,7 @@ export default function FormularioActividadEducativa() {
   const onError = (errors) => {
     console.log('SUBMIT ERROR', errors);
   };
+
   // =========================
   // RENDER
   // =========================
@@ -435,6 +467,7 @@ export default function FormularioActividadEducativa() {
             </FormControl>
           )}
         />
+
         <Controller
           name="ProyectoVinculadaId"
           control={control}
@@ -477,6 +510,7 @@ export default function FormularioActividadEducativa() {
           error={!!errors.InstitucionVinculada}
           helperText={errors.InstitucionVinculada?.message}
         />
+
         <TextField
           label="Publico"
           fullWidth
@@ -485,6 +519,7 @@ export default function FormularioActividadEducativa() {
           error={!!errors.PublicoObjetivo}
           helperText={errors.PublicoObjetivo?.message}
         />
+
         <TextField
           label="Observaciones"
           fullWidth
@@ -493,6 +528,7 @@ export default function FormularioActividadEducativa() {
           error={!!errors.Observaciones}
           helperText={errors.Observaciones?.message}
         />
+
         <Controller
           name="SalasIds"
           control={control}
@@ -528,6 +564,7 @@ export default function FormularioActividadEducativa() {
             </FormControl>
           )}
         />
+
         <Box sx={{ mt: 3 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Seleccione un horario
@@ -547,6 +584,7 @@ export default function FormularioActividadEducativa() {
             </FormHelperText>
           )}
         </Box>
+
         <Box
           sx={{
             mt: 2,
@@ -600,6 +638,7 @@ export default function FormularioActividadEducativa() {
             </FormControl>
           )}
         />
+
         <ImageUpload imagenes={imagenes} onChange={setImagenes} />
 
         <FormControlLabel
@@ -616,22 +655,45 @@ export default function FormularioActividadEducativa() {
           label="Solicitar asistencia para la creación del flyer o imagen promocional."
         />
 
-        <Controller
-          name="Recursos"
-          control={control}
-          render={({ field }) => (
-            <EventResourceSelector
-              recursos={recursosDisponibles}
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
-
         {/* =========================
-                    SUBMIT
-                ========================= */}
+            SOLICITUD DE RECURSOS
+        ========================= */}
 
+        <Box
+          sx={{
+            mt: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            cursor: 'pointer',
+            width: 'fit-content',
+            color: 'text.secondary',
+            '&:hover': {
+              color: 'text.primary',
+            },
+          }}
+          onClick={handleSolicitarRecursos}
+        >
+          <AddIcon />
+
+          <Typography variant="body1">Solicitar recursos</Typography>
+        </Box>
+
+        {mostrarSelectorRecursos && (
+          <Box sx={{ mt: 2 }}>
+            <Controller
+              name="Recursos"
+              control={control}
+              render={({ field }) => (
+                <EventResourceSelector
+                  recursos={recursosDisponibles}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </Box>
+        )}
         <Button
           type="submit"
           variant="contained"
@@ -639,7 +701,11 @@ export default function FormularioActividadEducativa() {
           sx={{ mt: 3 }}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Creando Actividad...' : 'Crear Actividad'}
+          {isSubmitting ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            'Crear actividad educativa'
+          )}
         </Button>
       </Box>
     </Box>

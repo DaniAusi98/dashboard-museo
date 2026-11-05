@@ -1,35 +1,26 @@
-import { useState } from "react";
-import dayjs from "dayjs";
+import { useState } from 'react';
+import dayjs from 'dayjs';
 
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 export default function ReportPeriodFilter({
-  fechaDesdeInicial = dayjs().startOf("month"),
-  fechaHastaInicial = dayjs().endOf("month"),
+  fechaDesdeInicial = dayjs().startOf('month'),
+  fechaHastaInicial = null,
   onAplicar,
 }) {
   const [fechaDesde, setFechaDesde] = useState(fechaDesdeInicial);
   const [fechaHasta, setFechaHasta] = useState(fechaHastaInicial);
 
   const aplicarPeriodo = () => {
-    if (
-      !fechaDesde ||
-      !fechaHasta ||
-      !fechaDesde.isValid() ||
-      !fechaHasta.isValid()
-    ) {
-      return;
-    }
+    if (!fechaDesde || !fechaDesde.isValid()) return;
 
-    if (fechaDesde.isAfter(fechaHasta)) {
-      return;
-    }
+    if (fechaHasta && !fechaHasta.isValid()) return;
+
+    if (fechaHasta && fechaDesde.isAfter(fechaHasta)) return;
 
     onAplicar(fechaDesde, fechaHasta);
   };
@@ -37,31 +28,28 @@ export default function ReportPeriodFilter({
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: {
-          xs: "flex-start",
-          sm: "flex-end",
-        },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: { xs: 'flex-start', sm: 'flex-end' },
         gap: 1,
-        flexWrap: "wrap",
+        flexWrap: 'wrap',
       }}
     >
       <DatePicker
+        label="Fecha"
         value={fechaDesde}
-        onChange={(newValue) => setFechaDesde(newValue)}
-        maxDate={fechaHasta}
+        onChange={(newValue) => {
+          setFechaDesde(newValue);
+
+          if (fechaHasta && newValue && newValue.isAfter(fechaHasta)) {
+            setFechaHasta(null);
+          }
+        }}
         format="DD/MM/YYYY"
         slotProps={{
           textField: {
-            size: "small",
-            sx: {
-              width: 160,
-              "& .MuiInputBase-input": {
-                fontSize: "0.8rem",
-                py: 0.7,
-              },
-            },
+            size: 'small',
+            sx: { width: 160 },
           },
         }}
       />
@@ -69,20 +57,16 @@ export default function ReportPeriodFilter({
       <Typography>-</Typography>
 
       <DatePicker
+        label=" Fecha hasta"
         value={fechaHasta}
-        onChange={(newValue) => setFechaHasta(newValue)}
+        disabled={!fechaDesde || !fechaDesde.isValid()}
+        onChange={setFechaHasta}
         minDate={fechaDesde}
         format="DD/MM/YYYY"
         slotProps={{
           textField: {
-            size: "small",
-            sx: {
-              width: 160,
-              "& .MuiInputBase-input": {
-                fontSize: "0.8rem",
-                py: 0.7,
-              },
-            },
+            size: 'small',
+            sx: { width: 160 },
           },
         }}
       />
@@ -91,9 +75,10 @@ export default function ReportPeriodFilter({
         variant="contained"
         size="small"
         onClick={aplicarPeriodo}
+        disabled={!fechaDesde || !fechaDesde.isValid()}
         sx={{
           height: 34,
-          fontSize: "0.8rem",
+          fontSize: '0.8rem',
         }}
       >
         Aplicar

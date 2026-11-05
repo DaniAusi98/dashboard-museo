@@ -52,33 +52,10 @@ const columns = [
     minWidth: 220,
   },
   {
-    field: 'tipoPublico',
-    headerName: 'Público',
-    flex: 1,
-    minWidth: 140,
-    renderCell: (params) =>
-      params.value?.length ? params.value.join(', ') : '-',
-  },
-  {
     field: 'cantidadPersonas',
     headerName: 'Personas',
     width: 110,
     type: 'number',
-  },
-  {
-    field: 'recursos',
-    headerName: 'Recursos',
-    flex: 1.5,
-    minWidth: 220,
-    renderCell: (params) => (
-      <Box sx={{ py: 1 }}>
-        {params.value?.length
-          ? params.value.map((recurso, index) => (
-              <div key={index}>{recurso}</div>
-            ))
-          : '-'}
-      </Box>
-    ),
   },
 ];
 

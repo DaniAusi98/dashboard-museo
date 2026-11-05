@@ -78,11 +78,6 @@ const eventsListItems = [
     path: '/eventProposal',
     icon: <DescriptionRoundedIcon />,
   },
-  {
-    text: 'Calendario y disponibilidad',
-    path: '/eventsCalendar',
-    icon: <CalendarMonthRoundedIcon />,
-  },
 ];
 
 const secondaryListItems = [
